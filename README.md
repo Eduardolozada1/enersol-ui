@@ -27,6 +27,14 @@ export default {
 import { Button, DataTable, PageHeader, AppsMenu } from "@enersol/ui";
 ```
 
+Con **Tailwind v4** (Proyectos, Contabilidad) no hay preset: los tokens van por CSS.
+
+```css
+@import "tailwindcss";
+@import "@enersol/ui/theme.css";
+@source "../node_modules/@enersol/ui/dist";
+```
+
 El Dockerfile del frontend necesita `git` para que `npm ci` pueda traer el paquete:
 `RUN apk add --no-cache git` antes de `npm ci` (imagen `node:20-alpine`).
 

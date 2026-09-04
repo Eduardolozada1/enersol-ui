@@ -1,0 +1,83 @@
+/*
+ * Tokens del sistema de diseño Enersol 2026 para módulos con Tailwind v4 (Proyectos,
+ * Contabilidad). Mismos valores que tailwind-preset.cjs (Tailwind v3). Uso:
+ *
+ *   @import "tailwindcss";
+ *   @import "@enersol/ui/theme.css";
+ *   @source "../node_modules/@enersol/ui/dist";   ← para que se generen las clases del paquete
+ *
+ * Si el módulo redefine un token después de este import, gana el del módulo.
+ */
+@theme {
+  --color-rojo-50: #FBEAEA;
+  --color-rojo-100: #F7D4D4;
+  --color-rojo-200: #EFA9A9;
+  --color-rojo-300: #E67E7E;
+  --color-rojo-400: #DE5353;
+  --color-rojo-500: #D62828;
+  --color-rojo-600: #AB2020;
+  --color-rojo-700: #801818;
+  --color-rojo-800: #561010;
+  --color-rojo-900: #2B0808;
+
+  --color-neutro-white: #FFFFFF;
+  --color-neutro-50: #F6F5F6;
+  --color-neutro-100: #ECEAEC;
+  --color-neutro-200: #D6D3D6;
+  --color-neutro-300: #A6A5A6;
+  --color-neutro-500: #909090;
+  --color-neutro-700: #797979;
+  --color-neutro-900: #494C4A;
+
+  --color-ambar-100: #FEF3C7;
+  --color-ambar-300: #FCD34D;
+  --color-ambar-500: #F59E0B;
+  --color-ambar-700: #B45309;
+
+  --color-verde-100: #E2E9CC;
+  --color-verde-300: #A9BE67;
+  --color-verde-500: #709302;
+  --color-verde-600: #5A7602;
+
+  --color-amarillo: #FFC02E;
+
+  --color-brand: #D62828;
+  --color-brand-fg: #AB2020;
+  --color-brand-strong: #801818;
+  --color-ink: #494C4A;
+  --color-subtle: #5F6260;
+  --color-line: #DDDBDD;
+  --color-surface: #FFFFFF;
+  --color-canvas: #F6F5F6;
+
+  --font-display: "Sora", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Roboto", ui-sans-serif, system-ui, sans-serif;
+
+  --text-display: 39px;
+  --text-display--line-height: 1.1;
+  --text-display--font-weight: 700;
+  --text-h2: 31px;
+  --text-h2--line-height: 1.2;
+  --text-h2--font-weight: 600;
+  --text-h3: 25px;
+  --text-h3--line-height: 1.25;
+  --text-h3--font-weight: 600;
+  --text-h4: 20px;
+  --text-h4--line-height: 1.3;
+  --text-h4--font-weight: 500;
+  --text-body: 16px;
+  --text-body--line-height: 1.5;
+  --text-caption: 13px;
+  --text-caption--line-height: 1.4;
+
+  --radius-card: 12px;
+  --radius-pill: 9999px;
+
+  --shadow-card: 0 1px 2px rgba(73, 76, 74, 0.06), 0 1px 3px rgba(73, 76, 74, 0.1);
+}
+
+/* Cifras tabulares (misma utilidad que en Operaciones/Hub). */
+.tnum {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
