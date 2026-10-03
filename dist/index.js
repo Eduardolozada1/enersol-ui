@@ -16,6 +16,7 @@ var BUTTON_SIZES = {
   sm: "h-8 px-3 text-caption",
   md: "h-9 px-4 text-[14px]"
 };
+var TACTIL = "[@media(pointer:coarse)]:min-h-[44px]";
 function Button({
   variant = "primary",
   size = "md",
@@ -26,7 +27,8 @@ function Button({
     "button",
     {
       className: cn(
-        "inline-flex items-center justify-center gap-2 rounded-md font-medium",
+        "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium",
+        TACTIL,
         "transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1",
         "disabled:opacity-50 disabled:pointer-events-none",
         BUTTON_VARIANTS[variant],
@@ -76,6 +78,7 @@ function Input({ className, ...props }) {
     {
       className: cn(
         "h-10 w-full rounded-md border border-line bg-white px-3 text-body text-ink",
+        TACTIL,
         "placeholder:text-neutro-300",
         "focus:outline-none focus:ring-2 focus:ring-rojo-300 focus:border-rojo-300",
         className
@@ -89,7 +92,8 @@ function Select({ className, ...props }) {
     "select",
     {
       className: cn(
-        "h-9 rounded-md border border-line bg-white px-3 text-caption text-ink",
+        "h-9 rounded-md border border-line bg-white px-3 text-base sm:text-caption text-ink",
+        TACTIL,
         "focus:outline-none focus:ring-2 focus:ring-rojo-300",
         className
       ),
@@ -149,15 +153,29 @@ function Modal({
     return () => window.removeEventListener("keydown", onKey);
   }, [open, onClose]);
   if (!open) return null;
-  return /* @__PURE__ */ jsx("div", { className: "fixed inset-0 z-50 flex items-center justify-center bg-ink/40 p-4", onClick: onClose, children: /* @__PURE__ */ jsxs(
+  return /* @__PURE__ */ jsx("div", { className: "fixed inset-0 z-50 flex items-end justify-center bg-ink/40 sm:items-center sm:p-4", onClick: onClose, children: /* @__PURE__ */ jsxs(
     "div",
     {
-      className: cn("bg-surface rounded-card shadow-card w-full max-h-[90vh] overflow-auto", maxWidth),
+      className: cn(
+        "bg-surface shadow-card w-full overflow-auto",
+        // Celular: hoja que sube desde abajo, a lo ancho. Desde sm: ventana centrada de siempre.
+        "max-h-[92vh] rounded-t-card sm:max-h-[90vh] sm:rounded-card",
+        maxWidth
+      ),
+      style: { paddingBottom: "env(safe-area-inset-bottom, 0px)" },
       onClick: (e) => e.stopPropagation(),
       children: [
         /* @__PURE__ */ jsxs("div", { className: "px-5 py-4 border-b border-line flex items-center justify-between sticky top-0 bg-surface", children: [
-          /* @__PURE__ */ jsx("h3", { className: "text-h4", children: title }),
-          /* @__PURE__ */ jsx("button", { onClick: onClose, className: "text-subtle hover:text-ink text-lg leading-none", "aria-label": "Cerrar", children: "\u2715" })
+          /* @__PURE__ */ jsx("h3", { className: "text-h4 min-w-0", children: title }),
+          /* @__PURE__ */ jsx(
+            "button",
+            {
+              onClick: onClose,
+              className: "-mr-2 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md text-subtle hover:text-ink text-lg leading-none",
+              "aria-label": "Cerrar",
+              children: "\u2715"
+            }
+          )
         ] }),
         /* @__PURE__ */ jsx("div", { className: "px-5 py-4", children })
       ]
@@ -254,7 +272,10 @@ function DataTable({
   rowClassName,
   className,
   /** Altura del header fijo de la app (para que la cabecera de la tabla se pegue debajo). */
-  stickyTopClassName = "top-14 lg:top-16"
+  stickyTopClassName = "top-14 lg:top-16",
+  /** En el celular (< 640 px): "tarjetas" (cada fila es una tarjeta con sus datos) o
+   *  "tabla" (la tabla de siempre, con scroll lateral dentro de su tarjeta). */
+  movil = "tarjetas"
 }) {
   const [sort, setSort] = useState(defaultSort ?? null);
   const ordenadas = useMemo(() => {
@@ -287,8 +308,12 @@ function DataTable({
     }
   }
   const pad = dense ? "px-3 py-2" : "px-4 py-3";
+  const tarjetas = movil === "tarjetas";
+  const colTitulo = columns.find((c) => c.tarjeta === "titulo") ?? columns.find((c) => c.tarjeta !== "oculta");
+  const colDatos = columns.filter((c) => c !== colTitulo && c.tarjeta !== "oculta");
+  const ordenables = columns.filter((c) => c.sortValue);
   const alignCls = (a) => a === "right" ? "text-right tnum" : a === "center" ? "text-center" : "text-left";
-  return /* @__PURE__ */ jsx(
+  return /* @__PURE__ */ jsxs(
     "div",
     {
       className: cn(
@@ -298,58 +323,114 @@ function DataTable({
         "overflow-x-auto lg:overflow-visible",
         className
       ),
-      children: /* @__PURE__ */ jsxs("table", { className: "w-full text-caption", children: [
-        /* @__PURE__ */ jsx("thead", { children: /* @__PURE__ */ jsx("tr", { className: "border-b border-line", children: columns.map((c) => {
-          const activa = sort?.key === c.key;
-          return /* @__PURE__ */ jsx(
-            "th",
-            {
-              style: c.width ? { width: c.width } : void 0,
-              "aria-sort": activa ? sort.dir === "asc" ? "ascending" : "descending" : void 0,
-              className: cn(
-                "sticky z-[5] bg-surface/95 backdrop-blur-sm",
-                stickyTopClassName,
-                "text-[11px] font-semibold uppercase tracking-wide text-subtle",
-                "border-b border-line",
-                pad,
-                alignCls(c.align),
-                c.hideBelow && HIDE[c.hideBelow]
-              ),
-              children: c.sortValue ? /* @__PURE__ */ jsxs(
-                "button",
-                {
-                  type: "button",
-                  onClick: () => toggleSort(c),
-                  className: cn("inline-flex items-center gap-1 hover:text-ink", activa && "text-ink"),
-                  children: [
-                    c.header,
-                    /* @__PURE__ */ jsx("span", { "aria-hidden": true, className: cn("text-[9px]", !activa && "opacity-30"), children: activa && sort.dir === "desc" ? "\u25BC" : "\u25B2" })
-                  ]
-                }
-              ) : c.header
-            },
-            c.key
-          );
-        }) }) }),
-        /* @__PURE__ */ jsxs("tbody", { children: [
-          ordenadas.length === 0 && /* @__PURE__ */ jsx("tr", { children: /* @__PURE__ */ jsx("td", { colSpan: columns.length, className: "p-0", children: /* @__PURE__ */ jsx(EmptyState, { title: empty?.title ?? "Nada por ac\xE1.", hint: empty?.hint, action: empty?.action }) }) }),
-          ordenadas.map((row) => /* @__PURE__ */ jsx(
-            "tr",
+      children: [
+        tarjetas && /* @__PURE__ */ jsxs("div", { className: "sm:hidden", children: [
+          ordenables.length > 0 && ordenadas.length > 1 && /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2 border-b border-line px-4 py-2 text-caption text-subtle", children: [
+            /* @__PURE__ */ jsx("span", { className: "shrink-0", children: "Ordenar" }),
+            /* @__PURE__ */ jsxs(
+              "select",
+              {
+                "aria-label": "Ordenar por",
+                value: sort ? `${sort.key}:${sort.dir}` : "",
+                onChange: (e) => {
+                  const [key, dir] = e.target.value.split(":");
+                  setSort(key ? { key, dir } : null);
+                },
+                className: "min-h-[44px] min-w-0 flex-1 rounded-md border border-line bg-white px-2 text-base text-ink",
+                children: [
+                  /* @__PURE__ */ jsx("option", { value: "", children: "Como vienen" }),
+                  ordenables.map((c) => /* @__PURE__ */ jsxs("optgroup", { label: typeof c.header === "string" ? c.header : c.key, children: [
+                    /* @__PURE__ */ jsxs("option", { value: `${c.key}:asc`, children: [
+                      typeof c.header === "string" ? c.header : c.key,
+                      " \u2191"
+                    ] }),
+                    /* @__PURE__ */ jsxs("option", { value: `${c.key}:desc`, children: [
+                      typeof c.header === "string" ? c.header : c.key,
+                      " \u2193"
+                    ] })
+                  ] }, c.key))
+                ]
+              }
+            )
+          ] }),
+          ordenadas.length === 0 ? /* @__PURE__ */ jsx(EmptyState, { title: empty?.title ?? "Nada por ac\xE1.", hint: empty?.hint, action: empty?.action }) : /* @__PURE__ */ jsx("ul", { children: ordenadas.map((row) => /* @__PURE__ */ jsxs(
+            "li",
             {
               onClick: onRowClick ? () => onRowClick(row) : void 0,
-              onKeyDown: (e) => onKey(e, row),
+              onKeyDown: onRowClick ? (e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), onRowClick(row)) : void 0,
               tabIndex: onRowClick ? 0 : void 0,
+              role: onRowClick ? "button" : void 0,
               className: cn(
-                "border-b border-line last:border-0",
-                onRowClick && "cursor-pointer hover:bg-neutro-50 focus:outline-none focus-visible:bg-neutro-50 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-rojo-300",
+                "border-b border-line px-4 py-3 last:border-0",
+                onRowClick && "cursor-pointer active:bg-neutro-50 focus:outline-none focus-visible:bg-neutro-50",
                 rowClassName?.(row)
               ),
-              children: columns.map((c) => /* @__PURE__ */ jsx("td", { className: cn(pad, alignCls(c.align), c.hideBelow && HIDE[c.hideBelow], c.className), children: c.render(row) }, c.key))
+              children: [
+                colTitulo && /* @__PURE__ */ jsx("div", { className: "min-w-0 text-[15px] font-medium text-ink", children: colTitulo.render(row) }),
+                colDatos.length > 0 && /* @__PURE__ */ jsx("dl", { className: "mt-1.5 grid grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-1 text-caption", children: colDatos.map((c) => /* @__PURE__ */ jsxs("div", { className: "contents", children: [
+                  /* @__PURE__ */ jsx("dt", { className: "text-subtle", children: c.etiquetaTarjeta ?? c.header }),
+                  /* @__PURE__ */ jsx("dd", { className: cn("min-w-0 break-words text-ink", c.align === "right" && "tnum"), children: c.render(row) })
+                ] }, c.key)) })
+              ]
             },
             rowKey(row)
-          ))
+          )) })
+        ] }),
+        /* @__PURE__ */ jsxs("table", { className: cn("w-full text-caption", tarjetas && "hidden sm:table"), children: [
+          /* @__PURE__ */ jsx("thead", { children: /* @__PURE__ */ jsx("tr", { className: "border-b border-line", children: columns.map((c) => {
+            const activa = sort?.key === c.key;
+            return /* @__PURE__ */ jsx(
+              "th",
+              {
+                style: c.width ? { width: c.width } : void 0,
+                "aria-sort": activa ? sort.dir === "asc" ? "ascending" : "descending" : void 0,
+                className: cn(
+                  // Fija solo desde lg: abajo la tabla scrollea dentro de su tarjeta y una
+                  // cabecera «sticky» con top-14 tapaba la primera fila.
+                  "lg:sticky z-[5] bg-surface/95 backdrop-blur-sm",
+                  stickyTopClassName,
+                  "text-[11px] font-semibold uppercase tracking-wide text-subtle",
+                  "border-b border-line",
+                  pad,
+                  alignCls(c.align),
+                  c.hideBelow && HIDE[c.hideBelow]
+                ),
+                children: c.sortValue ? /* @__PURE__ */ jsxs(
+                  "button",
+                  {
+                    type: "button",
+                    onClick: () => toggleSort(c),
+                    className: cn("inline-flex items-center gap-1 hover:text-ink", activa && "text-ink"),
+                    children: [
+                      c.header,
+                      /* @__PURE__ */ jsx("span", { "aria-hidden": true, className: cn("text-[9px]", !activa && "opacity-30"), children: activa && sort.dir === "desc" ? "\u25BC" : "\u25B2" })
+                    ]
+                  }
+                ) : c.header
+              },
+              c.key
+            );
+          }) }) }),
+          /* @__PURE__ */ jsxs("tbody", { children: [
+            ordenadas.length === 0 && /* @__PURE__ */ jsx("tr", { children: /* @__PURE__ */ jsx("td", { colSpan: columns.length, className: "p-0", children: /* @__PURE__ */ jsx(EmptyState, { title: empty?.title ?? "Nada por ac\xE1.", hint: empty?.hint, action: empty?.action }) }) }),
+            ordenadas.map((row) => /* @__PURE__ */ jsx(
+              "tr",
+              {
+                onClick: onRowClick ? () => onRowClick(row) : void 0,
+                onKeyDown: (e) => onKey(e, row),
+                tabIndex: onRowClick ? 0 : void 0,
+                className: cn(
+                  "border-b border-line last:border-0",
+                  onRowClick && "cursor-pointer hover:bg-neutro-50 focus:outline-none focus-visible:bg-neutro-50 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-rojo-300",
+                  rowClassName?.(row)
+                ),
+                children: columns.map((c) => /* @__PURE__ */ jsx("td", { className: cn(pad, alignCls(c.align), c.hideBelow && HIDE[c.hideBelow], c.className), children: c.render(row) }, c.key))
+              },
+              rowKey(row)
+            ))
+          ] })
         ] })
-      ] })
+      ]
     }
   );
 }
@@ -394,6 +475,7 @@ function AppsMenu({
         title: "Cambiar de m\xF3dulo",
         className: cn(
           "rounded-md p-1.5 text-subtle transition-colors hover:bg-neutro-100 hover:text-ink",
+          "[@media(pointer:coarse)]:p-2.5",
           abierto && "bg-neutro-100 text-ink"
         ),
         children: /* @__PURE__ */ jsxs("svg", { viewBox: "0 0 20 20", className: "h-5 w-5", fill: "currentColor", "aria-hidden": true, children: [
@@ -413,7 +495,7 @@ function AppsMenu({
       "div",
       {
         role: "menu",
-        className: "absolute left-0 top-full z-30 mt-2 w-72 rounded-card border border-line bg-surface p-1.5 shadow-card",
+        className: "absolute left-0 top-full z-30 mt-2 w-72 max-w-[calc(100vw-1.5rem)] rounded-card border border-line bg-surface p-1.5 shadow-card",
         children: [
           /* @__PURE__ */ jsx("div", { className: "px-2.5 pb-1.5 pt-1 text-[11px] font-semibold uppercase tracking-wide text-subtle", children: "M\xF3dulos" }),
           modulos.map((m) => {
@@ -427,7 +509,7 @@ function AppsMenu({
                 "aria-current": esActual ? "page" : void 0,
                 onClick: (e) => esActual && e.preventDefault(),
                 className: cn(
-                  "block rounded-md px-2.5 py-2 transition-colors",
+                  "block rounded-md px-2.5 py-2 transition-colors [@media(pointer:coarse)]:py-3",
                   esActual ? "bg-neutro-100 cursor-default" : "hover:bg-neutro-50"
                 ),
                 children: [
@@ -446,5 +528,79 @@ function AppsMenu({
     )
   ] });
 }
+function MobileMenu({
+  children,
+  title = "Men\xFA",
+  footer,
+  className
+}) {
+  const [abierto, setAbierto] = useState(false);
+  useEffect(() => {
+    if (!abierto) return;
+    const onKey = (e) => e.key === "Escape" && setAbierto(false);
+    document.addEventListener("keydown", onKey);
+    const previo = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = previo;
+    };
+  }, [abierto]);
+  function alTocar(e) {
+    const el = e.target.closest("a, [data-cierra]");
+    if (el) setAbierto(false);
+  }
+  return /* @__PURE__ */ jsxs("div", { className, children: [
+    /* @__PURE__ */ jsx(
+      "button",
+      {
+        type: "button",
+        onClick: () => setAbierto(true),
+        "aria-haspopup": "dialog",
+        "aria-expanded": abierto,
+        "aria-label": "Abrir men\xFA",
+        className: "inline-flex h-11 w-11 items-center justify-center rounded-md text-ink transition-colors hover:bg-neutro-100",
+        children: /* @__PURE__ */ jsx("svg", { viewBox: "0 0 24 24", className: "h-6 w-6", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", "aria-hidden": true, children: /* @__PURE__ */ jsx("path", { d: "M4 7h16M4 12h16M4 17h16" }) })
+      }
+    ),
+    abierto && /* @__PURE__ */ jsx("div", { className: "fixed inset-0 z-50 bg-ink/40", onClick: () => setAbierto(false), children: /* @__PURE__ */ jsxs(
+      "div",
+      {
+        role: "dialog",
+        "aria-modal": "true",
+        "aria-label": typeof title === "string" ? title : "Men\xFA",
+        onClick: (e) => e.stopPropagation(),
+        className: "absolute inset-y-0 right-0 flex w-[86vw] max-w-sm flex-col bg-surface shadow-card",
+        style: { paddingTop: "env(safe-area-inset-top, 0px)", paddingBottom: "env(safe-area-inset-bottom, 0px)" },
+        children: [
+          /* @__PURE__ */ jsxs("div", { className: "flex items-center justify-between border-b border-line px-4 py-2", children: [
+            /* @__PURE__ */ jsx("div", { className: "font-display text-[17px] font-semibold text-ink", children: title }),
+            /* @__PURE__ */ jsx(
+              "button",
+              {
+                type: "button",
+                onClick: () => setAbierto(false),
+                "aria-label": "Cerrar men\xFA",
+                className: "inline-flex h-11 w-11 items-center justify-center rounded-md text-subtle hover:bg-neutro-100 hover:text-ink",
+                children: /* @__PURE__ */ jsx("svg", { viewBox: "0 0 24 24", className: "h-5 w-5", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", "aria-hidden": true, children: /* @__PURE__ */ jsx("path", { d: "M6 6l12 12M18 6L6 18" }) })
+              }
+            )
+          ] }),
+          /* @__PURE__ */ jsx("div", { className: "flex-1 overflow-y-auto px-2 py-2", onClick: alTocar, children: /* @__PURE__ */ jsx("nav", { className: "flex flex-col", children }) }),
+          footer && /* @__PURE__ */ jsx("div", { className: "border-t border-line px-2 py-2", onClick: alTocar, children: footer })
+        ]
+      }
+    ) })
+  ] });
+}
+function mobileMenuItemClass(activo = false) {
+  return cn(
+    "flex min-h-[48px] w-full items-center gap-3 rounded-md px-3 text-left text-[16px] font-medium transition-colors",
+    activo ? "bg-neutro-100 text-brand" : "text-ink hover:bg-neutro-50"
+  );
+}
+function MobileMenuSection({ children }) {
+  return /* @__PURE__ */ jsx("div", { className: "px-3 pb-1 pt-3 text-[12px] font-semibold uppercase tracking-wide text-subtle", children });
+}
 
-export { AppsMenu, Badge, Button, Card, CardBody, CardHeader, CenteredSpinner, CollapsibleCard, DataTable, EmptyState, HUB_URL, Input, Logo, MODULOS_ENERSOL, Modal, PageHeader, Select, Spinner, cn };
+export { AppsMenu, Badge, Button, Card, CardBody, CardHeader, CenteredSpinner, CollapsibleCard, DataTable, EmptyState, HUB_URL, Input, Logo, MODULOS_ENERSOL, MobileMenu, MobileMenuSection, Modal, PageHeader, Select, Spinner, cn, mobileMenuItemClass };
