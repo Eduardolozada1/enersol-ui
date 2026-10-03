@@ -14,9 +14,14 @@ export type Column<T> = {
   align?: "left" | "right" | "center";
   /** Ancho CSS opcional (p.ej. "140px", "20%"). */
   width?: string;
-  /** Oculta la columna por debajo del breakpoint (para celular). */
+  /** Oculta la columna por debajo del breakpoint (en la vista de tabla). */
   hideBelow?: "sm" | "md" | "lg" | "xl";
   className?: string;
+  /** Vista de tarjetas en el celular: "titulo" = encabeza la tarjeta (por defecto la primera
+   *  columna), "oculta" = no se muestra en la tarjeta, "dato" = par etiqueta/valor (default). */
+  tarjeta?: "titulo" | "dato" | "oculta";
+  /** Etiqueta en la tarjeta si el header no es texto o no sirve (p.ej. columna de acciones). */
+  etiquetaTarjeta?: ReactNode;
 };
 
 const HIDE: Record<NonNullable<Column<unknown>["hideBelow"]>, string> = {
@@ -38,6 +43,9 @@ export function DataTable<T>({
   className,
   /** Altura del header fijo de la app (para que la cabecera de la tabla se pegue debajo). */
   stickyTopClassName = "top-14 lg:top-16",
+  /** En el celular (< 640 px): "tarjetas" (cada fila es una tarjeta con sus datos) o
+   *  "tabla" (la tabla de siempre, con scroll lateral dentro de su tarjeta). */
+  movil = "tarjetas",
 }: {
   columns: Column<T>[];
   rows: T[];
@@ -49,6 +57,7 @@ export function DataTable<T>({
   rowClassName?: (row: T) => string | undefined;
   className?: string;
   stickyTopClassName?: string;
+  movil?: "tarjetas" | "tabla";
 }) {
   const [sort, setSort] = useState<{ key: string; dir: "asc" | "desc" } | null>(defaultSort ?? null);
 
@@ -88,6 +97,10 @@ export function DataTable<T>({
   }
 
   const pad = dense ? "px-3 py-2" : "px-4 py-3";
+  const tarjetas = movil === "tarjetas";
+  const colTitulo = columns.find((c) => c.tarjeta === "titulo") ?? columns.find((c) => c.tarjeta !== "oculta");
+  const colDatos = columns.filter((c) => c !== colTitulo && c.tarjeta !== "oculta");
+  const ordenables = columns.filter((c) => c.sortValue);
   const alignCls = (a?: Column<T>["align"]) =>
     a === "right" ? "text-right tnum" : a === "center" ? "text-center" : "text-left";
 
@@ -101,7 +114,65 @@ export function DataTable<T>({
         className,
       )}
     >
-      <table className="w-full text-caption">
+      {tarjetas && (
+        <div className="sm:hidden">
+          {ordenables.length > 0 && ordenadas.length > 1 && (
+            <div className="flex items-center gap-2 border-b border-line px-4 py-2 text-caption text-subtle">
+              <span className="shrink-0">Ordenar</span>
+              <select
+                aria-label="Ordenar por"
+                value={sort ? `${sort.key}:${sort.dir}` : ""}
+                onChange={(e) => {
+                  const [key, dir] = e.target.value.split(":");
+                  setSort(key ? { key, dir: dir as "asc" | "desc" } : null);
+                }}
+                className="min-h-[44px] min-w-0 flex-1 rounded-md border border-line bg-white px-2 text-base text-ink"
+              >
+                <option value="">Como vienen</option>
+                {ordenables.map((c) => (
+                  <optgroup key={c.key} label={typeof c.header === "string" ? c.header : c.key}>
+                    <option value={`${c.key}:asc`}>{typeof c.header === "string" ? c.header : c.key} ↑</option>
+                    <option value={`${c.key}:desc`}>{typeof c.header === "string" ? c.header : c.key} ↓</option>
+                  </optgroup>
+                ))}
+              </select>
+            </div>
+          )}
+          {ordenadas.length === 0 ? (
+            <EmptyState title={empty?.title ?? "Nada por acá."} hint={empty?.hint} action={empty?.action} />
+          ) : (
+            <ul>
+              {ordenadas.map((row) => (
+                <li
+                  key={rowKey(row)}
+                  onClick={onRowClick ? () => onRowClick(row) : undefined}
+                  onKeyDown={onRowClick ? (e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), onRowClick(row)) : undefined}
+                  tabIndex={onRowClick ? 0 : undefined}
+                  role={onRowClick ? "button" : undefined}
+                  className={cn(
+                    "border-b border-line px-4 py-3 last:border-0",
+                    onRowClick && "cursor-pointer active:bg-neutro-50 focus:outline-none focus-visible:bg-neutro-50",
+                    rowClassName?.(row),
+                  )}
+                >
+                  {colTitulo && <div className="min-w-0 text-[15px] font-medium text-ink">{colTitulo.render(row)}</div>}
+                  {colDatos.length > 0 && (
+                    <dl className="mt-1.5 grid grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-1 text-caption">
+                      {colDatos.map((c) => (
+                        <div key={c.key} className="contents">
+                          <dt className="text-subtle">{c.etiquetaTarjeta ?? c.header}</dt>
+                          <dd className={cn("min-w-0 break-words text-ink", c.align === "right" && "tnum")}>{c.render(row)}</dd>
+                        </div>
+                      ))}
+                    </dl>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
+      <table className={cn("w-full text-caption", tarjetas && "hidden sm:table")}>
         <thead>
           <tr className="border-b border-line">
             {columns.map((c) => {
@@ -112,7 +183,9 @@ export function DataTable<T>({
                   style={c.width ? { width: c.width } : undefined}
                   aria-sort={activa ? (sort!.dir === "asc" ? "ascending" : "descending") : undefined}
                   className={cn(
-                    "sticky z-[5] bg-surface/95 backdrop-blur-sm",
+                    // Fija solo desde lg: abajo la tabla scrollea dentro de su tarjeta y una
+                    // cabecera «sticky» con top-14 tapaba la primera fila.
+                    "lg:sticky z-[5] bg-surface/95 backdrop-blur-sm",
                     stickyTopClassName,
                     "text-[11px] font-semibold uppercase tracking-wide text-subtle",
                     "border-b border-line",

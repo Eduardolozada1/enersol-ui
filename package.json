@@ -1,6 +1,6 @@
 {
   "name": "@enersol/ui",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Componentes y tokens de diseño compartidos del ecosistema Enersol (Operaciones, Plataforma, Proyectos, Marketing, Contabilidad).",
   "license": "UNLICENSED",
   "private": false,

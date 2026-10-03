@@ -17,6 +17,10 @@ const BUTTON_SIZES: Record<ButtonSize, string> = {
   md: "h-9 px-4 text-[14px]",
 };
 
+/** En pantallas táctiles (dedo, no mouse) todo lo tocable mide al menos 44 px de alto.
+ *  En escritorio no cambia nada: la condición es el tipo de puntero, no el ancho. */
+const TACTIL = "[@media(pointer:coarse)]:min-h-[44px]";
+
 export function Button({
   variant = "primary",
   size = "md",
@@ -26,7 +30,8 @@ export function Button({
   return (
     <button
       className={cn(
-        "inline-flex items-center justify-center gap-2 rounded-md font-medium",
+        "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium",
+        TACTIL,
         "transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1",
         "disabled:opacity-50 disabled:pointer-events-none",
         BUTTON_VARIANTS[variant],
@@ -90,6 +95,7 @@ export function Input({ className, ...props }: InputHTMLAttributes<HTMLInputElem
     <input
       className={cn(
         "h-10 w-full rounded-md border border-line bg-white px-3 text-body text-ink",
+        TACTIL,
         "placeholder:text-neutro-300",
         "focus:outline-none focus:ring-2 focus:ring-rojo-300 focus:border-rojo-300",
         className,
@@ -103,7 +109,8 @@ export function Select({ className, ...props }: SelectHTMLAttributes<HTMLSelectE
   return (
     <select
       className={cn(
-        "h-9 rounded-md border border-line bg-white px-3 text-caption text-ink",
+        "h-9 rounded-md border border-line bg-white px-3 text-base sm:text-caption text-ink",
+        TACTIL,
         "focus:outline-none focus:ring-2 focus:ring-rojo-300",
         className,
       )}
@@ -190,14 +197,24 @@ export function Modal({
 
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 p-4" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-ink/40 sm:items-center sm:p-4" onClick={onClose}>
       <div
-        className={cn("bg-surface rounded-card shadow-card w-full max-h-[90vh] overflow-auto", maxWidth)}
+        className={cn(
+          "bg-surface shadow-card w-full overflow-auto",
+          // Celular: hoja que sube desde abajo, a lo ancho. Desde sm: ventana centrada de siempre.
+          "max-h-[92vh] rounded-t-card sm:max-h-[90vh] sm:rounded-card",
+          maxWidth,
+        )}
+        style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="px-5 py-4 border-b border-line flex items-center justify-between sticky top-0 bg-surface">
-          <h3 className="text-h4">{title}</h3>
-          <button onClick={onClose} className="text-subtle hover:text-ink text-lg leading-none" aria-label="Cerrar">
+          <h3 className="text-h4 min-w-0">{title}</h3>
+          <button
+            onClick={onClose}
+            className="-mr-2 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md text-subtle hover:text-ink text-lg leading-none"
+            aria-label="Cerrar"
+          >
             ✕
           </button>
         </div>

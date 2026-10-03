@@ -94,13 +94,21 @@ type Column<T> = {
     align?: "left" | "right" | "center";
     /** Ancho CSS opcional (p.ej. "140px", "20%"). */
     width?: string;
-    /** Oculta la columna por debajo del breakpoint (para celular). */
+    /** Oculta la columna por debajo del breakpoint (en la vista de tabla). */
     hideBelow?: "sm" | "md" | "lg" | "xl";
     className?: string;
+    /** Vista de tarjetas en el celular: "titulo" = encabeza la tarjeta (por defecto la primera
+     *  columna), "oculta" = no se muestra en la tarjeta, "dato" = par etiqueta/valor (default). */
+    tarjeta?: "titulo" | "dato" | "oculta";
+    /** Etiqueta en la tarjeta si el header no es texto o no sirve (p.ej. columna de acciones). */
+    etiquetaTarjeta?: ReactNode;
 };
 declare function DataTable<T>({ columns, rows, rowKey, onRowClick, defaultSort, empty, dense, rowClassName, className, 
 /** Altura del header fijo de la app (para que la cabecera de la tabla se pegue debajo). */
-stickyTopClassName, }: {
+stickyTopClassName, 
+/** En el celular (< 640 px): "tarjetas" (cada fila es una tarjeta con sus datos) o
+ *  "tabla" (la tabla de siempre, con scroll lateral dentro de su tarjeta). */
+movil, }: {
     columns: Column<T>[];
     rows: T[];
     rowKey: (row: T) => string | number;
@@ -118,6 +126,7 @@ stickyTopClassName, }: {
     rowClassName?: (row: T) => string | undefined;
     className?: string;
     stickyTopClassName?: string;
+    movil?: "tarjetas" | "tabla";
 }): react.JSX.Element;
 
 /** Los módulos del ecosistema Enersol (Distribución queda fuera). El orden es el del
@@ -141,4 +150,25 @@ declare function AppsMenu({ actual, hubUrl, modulos, className, }: {
     className?: string;
 }): react.JSX.Element;
 
-export { AppsMenu, Badge, type BadgeTone, Button, type ButtonSize, type ButtonVariant, Card, CardBody, CardHeader, CenteredSpinner, CollapsibleCard, type Column, DataTable, EmptyState, HUB_URL, Input, Logo, type LogoVariant, MODULOS_ENERSOL, Modal, type ModuloEnersol, PageHeader, Select, Spinner, cn };
+/** Menú del encabezado para celular y tablet (se usa con `lg:hidden`; en escritorio cada
+ *  módulo sigue mostrando su barra de navegación de siempre). Un botón ☰ abre una hoja a la
+ *  derecha con los links del módulo y las acciones secundarias (guía, Mejoras, usuario,
+ *  salir). Se cierra al tocar cualquier link, con Escape o tocando afuera.
+ *
+ *  Los links los arma cada módulo (con su router) usando `mobileMenuItemClass` para que
+ *  todos se vean y se toquen igual (filas de 48 px). */
+declare function MobileMenu({ children, title, footer, className, }: {
+    children: ReactNode;
+    title?: ReactNode;
+    /** Zona de abajo (usuario, cambiar clave, salir). */
+    footer?: ReactNode;
+    className?: string;
+}): react.JSX.Element;
+/** Clase de cada fila del MobileMenu (link o botón): 48 px de alto, texto de 16 px. */
+declare function mobileMenuItemClass(activo?: boolean): string;
+/** Título de grupo dentro del MobileMenu (p.ej. «Administración»). */
+declare function MobileMenuSection({ children }: {
+    children: ReactNode;
+}): react.JSX.Element;
+
+export { AppsMenu, Badge, type BadgeTone, Button, type ButtonSize, type ButtonVariant, Card, CardBody, CardHeader, CenteredSpinner, CollapsibleCard, type Column, DataTable, EmptyState, HUB_URL, Input, Logo, type LogoVariant, MODULOS_ENERSOL, MobileMenu, MobileMenuSection, Modal, type ModuloEnersol, PageHeader, Select, Spinner, cn, mobileMenuItemClass };
