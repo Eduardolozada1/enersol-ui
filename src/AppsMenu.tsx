@@ -19,7 +19,7 @@ export const MODULOS_ENERSOL: ModuloEnersol[] = [
   { clave: "propuestas", nombre: "Proyectos", url: "https://propuestas.enersol-sa.com", descripcion: "Cotizador, propuestas y CRM" },
   { clave: "marketing", nombre: "Marketing", url: "https://marketing.enersol-sa.com", descripcion: "Funnel, campañas y mensajería" },
   { clave: "contabilidad", nombre: "Contabilidad", url: "https://contabilidad.enersol-sa.com", descripcion: "Contable, inventario y tesorería" },
-  { clave: "financiamiento", nombre: "Financiamiento", url: "https://propuestas.enersol-sa.com/financiamiento", descripcion: "Créditos a clientes y cobranza" },
+  { clave: "financiamiento", nombre: "Financiamiento", url: "https://financiamiento.enersol-sa.com", descripcion: "Créditos a clientes y cobranza" },
 ];
 
 /** Menú «Apps»: saltar entre módulos sin volver al lanzador. Va junto al logo en el
