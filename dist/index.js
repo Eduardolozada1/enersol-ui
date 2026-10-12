@@ -441,7 +441,7 @@ var MODULOS_ENERSOL = [
   { clave: "propuestas", nombre: "Proyectos", url: "https://propuestas.enersol-sa.com", descripcion: "Cotizador, propuestas y CRM" },
   { clave: "marketing", nombre: "Marketing", url: "https://marketing.enersol-sa.com", descripcion: "Funnel, campa\xF1as y mensajer\xEDa" },
   { clave: "contabilidad", nombre: "Contabilidad", url: "https://contabilidad.enersol-sa.com", descripcion: "Contable, inventario y tesorer\xEDa" },
-  { clave: "financiamiento", nombre: "Cuotas", url: "https://financiamiento.enersol-sa.com", descripcion: "Pago en cuotas y cobranza" }
+  { clave: "financiamiento", nombre: "Cuotas", url: "https://cuotas.enersol-sa.com", descripcion: "Pago en cuotas y cobranza" }
 ];
 function AppsMenu({
   actual,
