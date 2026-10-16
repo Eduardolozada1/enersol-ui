@@ -1,5 +1,5 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
-import { jsx, jsxs } from 'react/jsx-runtime';
+import { useState, useEffect, useMemo, useRef, Fragment, useId, useCallback } from 'react';
+import { jsx, jsxs, Fragment as Fragment$1 } from 'react/jsx-runtime';
 
 // src/cn.ts
 function cn(...parts) {
@@ -603,5 +603,451 @@ function mobileMenuItemClass(activo = false) {
 function MobileMenuSection({ children }) {
   return /* @__PURE__ */ jsx("div", { className: "px-3 pb-1 pt-3 text-[12px] font-semibold uppercase tracking-wide text-subtle", children });
 }
+var DESDE = {
+  lg: { flex: "lg:flex", block: "lg:block", contents: "lg:contents", oculto: "lg:hidden", gap: "lg:gap-4", gapAcciones: "lg:gap-3", px: "lg:px-6" },
+  xl: { flex: "xl:flex", block: "xl:block", contents: "xl:contents", oculto: "xl:hidden", gap: "xl:gap-4", gapAcciones: "xl:gap-3", px: "xl:px-6" },
+  "2xl": { flex: "2xl:flex", block: "2xl:block", contents: "2xl:contents", oculto: "2xl:hidden", gap: "2xl:gap-4", gapAcciones: "2xl:gap-3", px: "2xl:px-6" }
+};
+function isAppHeaderItemActive(item, path) {
+  if (item.match?.(path)) return true;
+  if (item.href === "/") return path === "/";
+  const base = item.href.replace(/\/+$/, "");
+  return path === base || path.startsWith(`${base}/`);
+}
+function groupAppHeaderItems(items) {
+  const main = [];
+  const grupos = /* @__PURE__ */ new Map();
+  for (const item of items) {
+    if (!item.group) main.push(item);
+    else grupos.set(item.group, [...grupos.get(item.group) ?? [], item]);
+  }
+  return { main, groups: [...grupos.entries()] };
+}
+var enlacePorDefecto = ({ href, ...props }) => /* @__PURE__ */ jsx("a", { href, ...props });
+var claseBarra = (activo) => cn(
+  "whitespace-nowrap px-2 py-2 text-[13px] font-medium transition-colors",
+  activo ? "text-brand" : "text-subtle hover:text-brand"
+);
+function MasSecciones({
+  label,
+  groups,
+  path,
+  renderLink
+}) {
+  const [abierto, setAbierto] = useState(false);
+  const ref = useRef(null);
+  const activo = groups.some(([, items]) => items.some((i) => isAppHeaderItemActive(i, path)));
+  useEffect(() => {
+    if (!abierto) return;
+    const onDoc = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) setAbierto(false);
+    };
+    const onKey = (e) => e.key === "Escape" && setAbierto(false);
+    document.addEventListener("mousedown", onDoc);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDoc);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [abierto]);
+  useEffect(() => setAbierto(false), [path]);
+  return /* @__PURE__ */ jsxs("div", { ref, className: "relative", children: [
+    /* @__PURE__ */ jsxs(
+      "button",
+      {
+        type: "button",
+        onClick: () => setAbierto((v) => !v),
+        "aria-haspopup": "menu",
+        "aria-expanded": abierto,
+        className: cn(claseBarra(activo), "inline-flex items-center gap-1"),
+        children: [
+          label,
+          /* @__PURE__ */ jsx("svg", { viewBox: "0 0 20 20", className: cn("h-3.5 w-3.5 transition-transform", abierto && "rotate-180"), fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", "aria-hidden": true, children: /* @__PURE__ */ jsx("path", { d: "M5 8l5 5 5-5" }) })
+        ]
+      }
+    ),
+    abierto && /* @__PURE__ */ jsx(
+      "div",
+      {
+        role: "menu",
+        className: "absolute left-0 top-full z-30 mt-2 grid w-max max-w-[calc(100vw-1.5rem)] grid-cols-2 gap-x-6 gap-y-3 rounded-card border border-line bg-surface p-3 shadow-card",
+        children: groups.map(([grupo, items]) => /* @__PURE__ */ jsxs("div", { className: "min-w-[10rem]", children: [
+          /* @__PURE__ */ jsx("div", { className: "px-2 pb-1 text-[11px] font-semibold uppercase tracking-wide text-subtle", children: grupo }),
+          items.map((item) => {
+            const actual = isAppHeaderItemActive(item, path);
+            return /* @__PURE__ */ jsx(Fragment, { children: renderLink({
+              href: item.href,
+              role: "menuitem",
+              "aria-current": actual ? "page" : void 0,
+              onClick: () => setAbierto(false),
+              className: cn(
+                "block whitespace-nowrap rounded-md px-2 py-1.5 text-[13px] font-medium transition-colors",
+                actual ? "bg-neutro-100 text-brand" : "text-ink hover:bg-neutro-50 hover:text-brand"
+              ),
+              children: item.label
+            }) }, item.href);
+          })
+        ] }, grupo))
+      }
+    )
+  ] });
+}
+function AppHeader({
+  moduleKey,
+  moduleName,
+  logo,
+  homeHref = "/",
+  items,
+  currentPath,
+  renderLink = enlacePorDefecto,
+  notice,
+  persistentActions,
+  actions,
+  user,
+  onLogout,
+  mobileMenuFooter,
+  desktopFrom = "lg",
+  moreLabel = "M\xE1s",
+  hubUrl = HUB_URL,
+  className
+}) {
+  const bp = DESDE[desktopFrom];
+  const { main, groups } = groupAppHeaderItems(items);
+  const enlaceMovil = (item) => {
+    const actual = isAppHeaderItemActive(item, currentPath);
+    return /* @__PURE__ */ jsx(Fragment, { children: renderLink({
+      href: item.href,
+      "aria-current": actual ? "page" : void 0,
+      className: mobileMenuItemClass(actual),
+      children: item.label
+    }) }, item.href);
+  };
+  return /* @__PURE__ */ jsxs("header", { className: cn("sticky top-0 z-30 border-b border-neutro-200 bg-white", className), children: [
+    notice && /* @__PURE__ */ jsx("div", { role: "status", className: "border-b border-ambar-300 bg-ambar-100 px-4 py-2 text-center text-[13px] font-medium text-ambar-700", children: notice }),
+    /* @__PURE__ */ jsxs("div", { className: cn("flex h-16 items-center justify-between gap-2 px-3", bp.gap, bp.px), children: [
+      /* @__PURE__ */ jsxs("div", { className: cn("flex min-w-0 items-center gap-2", bp.gap), children: [
+        /* @__PURE__ */ jsx(AppsMenu, { actual: moduleKey, hubUrl, className: "-ml-1.5 shrink-0" }),
+        renderLink({ href: homeHref, className: "shrink-0", children: logo }),
+        /* @__PURE__ */ jsx("span", { className: cn("min-w-0 truncate font-display text-[15px] font-semibold text-neutro-900", bp.oculto), children: moduleName }),
+        /* @__PURE__ */ jsx("span", { className: cn("hidden h-6 w-px shrink-0 bg-neutro-200", bp.block), "aria-hidden": true }),
+        /* @__PURE__ */ jsx("span", { className: cn("hidden shrink-0 whitespace-nowrap font-display text-[17px] font-semibold text-neutro-900", bp.block), children: moduleName }),
+        /* @__PURE__ */ jsxs("nav", { "aria-label": "Secciones del m\xF3dulo", className: cn("hidden shrink-0 items-center gap-1", bp.flex), children: [
+          main.map((item) => {
+            const actual = isAppHeaderItemActive(item, currentPath);
+            return /* @__PURE__ */ jsx(Fragment, { children: renderLink({
+              href: item.href,
+              "aria-current": actual ? "page" : void 0,
+              className: claseBarra(actual),
+              children: item.label
+            }) }, item.href);
+          }),
+          groups.length > 0 && /* @__PURE__ */ jsx(MasSecciones, { label: moreLabel, groups, path: currentPath, renderLink })
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxs("div", { className: cn("flex shrink-0 items-center gap-1", bp.gapAcciones), children: [
+        persistentActions,
+        /* @__PURE__ */ jsxs("span", { className: cn("hidden", bp.contents), children: [
+          actions,
+          user && /* @__PURE__ */ jsx("span", { className: "hidden whitespace-nowrap text-[13px] text-neutro-900 2xl:block", title: user.email, children: user.name }),
+          onLogout && /* @__PURE__ */ jsx("button", { type: "button", onClick: onLogout, className: "px-2 py-1 text-[13px] text-subtle transition-colors hover:text-brand", children: "Salir" })
+        ] }),
+        /* @__PURE__ */ jsxs(
+          MobileMenu,
+          {
+            className: bp.oculto,
+            title: moduleName,
+            footer: (user || mobileMenuFooter || onLogout) && /* @__PURE__ */ jsxs(Fragment$1, { children: [
+              user && /* @__PURE__ */ jsxs("div", { className: "px-3 pb-2 pt-1", children: [
+                /* @__PURE__ */ jsx("div", { className: "truncate text-[15px] font-medium text-ink", children: user.name }),
+                user.email && /* @__PURE__ */ jsx("div", { className: "truncate text-[13px] text-subtle", children: user.email })
+              ] }),
+              mobileMenuFooter,
+              onLogout && /* @__PURE__ */ jsx("button", { type: "button", "data-cierra": true, onClick: onLogout, className: mobileMenuItemClass(), children: "Salir" })
+            ] }),
+            children: [
+              main.map(enlaceMovil),
+              groups.map(([grupo, lista]) => /* @__PURE__ */ jsxs(Fragment, { children: [
+                /* @__PURE__ */ jsx(MobileMenuSection, { children: grupo }),
+                lista.map(enlaceMovil)
+              ] }, grupo))
+            ]
+          }
+        )
+      ] })
+    ] })
+  ] });
+}
+var ENFOCABLES = 'button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])';
+var mensajeDe = (e) => e instanceof Error && e.message ? e.message : typeof e === "string" && e ? e : "No se pudo completar. Prob\xE1 de nuevo.";
+function ConfirmDialog({
+  open,
+  title,
+  children,
+  confirmLabel = "Confirmar",
+  cancelLabel = "Cancelar",
+  tone = "primary",
+  reason,
+  busy = false,
+  error,
+  onConfirm,
+  onCancel
+}) {
+  const [texto, setTexto] = useState("");
+  const [procesando, setProcesando] = useState(false);
+  const [fallo, setFallo] = useState(null);
+  const tituloId = useId();
+  const cuerpoId = useId();
+  const cajaRef = useRef(null);
+  const ocupado = busy || procesando;
+  useEffect(() => {
+    if (!open) return;
+    setTexto("");
+    setFallo(null);
+    setProcesando(false);
+    const previo = document.activeElement;
+    return () => previo?.focus?.();
+  }, [open]);
+  const focoInicial = reason ? "motivo" : tone === "danger" ? "cancelar" : "confirmar";
+  const focoRef = useRef(focoInicial);
+  focoRef.current = focoInicial;
+  useEffect(() => {
+    if (!open) return;
+    cajaRef.current?.querySelector(`[data-foco="${focoRef.current}"]`)?.focus();
+  }, [open]);
+  const cancelar = useCallback(() => {
+    if (!ocupado) onCancel();
+  }, [ocupado, onCancel]);
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e) => e.key === "Escape" && cancelar();
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, cancelar]);
+  if (!open) return null;
+  const minimo = reason?.required ? Math.max(1, reason.minLength ?? 1) : 0;
+  const motivoListo = texto.trim().length >= minimo;
+  async function confirmar() {
+    if (ocupado || !motivoListo) return;
+    setFallo(null);
+    try {
+      const resultado = onConfirm(texto.trim());
+      if (resultado && typeof resultado.then === "function") {
+        setProcesando(true);
+        await resultado;
+      }
+    } catch (e) {
+      setFallo(mensajeDe(e));
+    } finally {
+      setProcesando(false);
+    }
+  }
+  function atraparFoco(e) {
+    if (e.key !== "Tab" || !cajaRef.current) return;
+    const enfocables = [...cajaRef.current.querySelectorAll(ENFOCABLES)];
+    if (enfocables.length === 0) return;
+    const primero = enfocables[0];
+    const ultimo = enfocables[enfocables.length - 1];
+    if (e.shiftKey && document.activeElement === primero) {
+      e.preventDefault();
+      ultimo.focus();
+    } else if (!e.shiftKey && document.activeElement === ultimo) {
+      e.preventDefault();
+      primero.focus();
+    }
+  }
+  const errorVisible = fallo ?? error;
+  return /* @__PURE__ */ jsx(
+    "div",
+    {
+      className: "fixed inset-0 z-50 flex items-end justify-center bg-ink/40 sm:items-center sm:p-4",
+      onClick: cancelar,
+      children: /* @__PURE__ */ jsxs(
+        "div",
+        {
+          ref: cajaRef,
+          role: "alertdialog",
+          "aria-modal": "true",
+          "aria-labelledby": tituloId,
+          "aria-describedby": children ? cuerpoId : void 0,
+          "aria-busy": ocupado || void 0,
+          className: cn(
+            "w-full max-w-md overflow-auto bg-surface shadow-card",
+            "max-h-[92vh] rounded-t-card sm:max-h-[90vh] sm:rounded-card"
+          ),
+          style: { paddingBottom: "env(safe-area-inset-bottom, 0px)" },
+          onClick: (e) => e.stopPropagation(),
+          onKeyDown: atraparFoco,
+          children: [
+            /* @__PURE__ */ jsx("div", { className: "border-b border-line px-5 py-4", children: /* @__PURE__ */ jsx("h3", { id: tituloId, className: "text-h4 text-ink", children: title }) }),
+            /* @__PURE__ */ jsxs("div", { className: "space-y-4 px-5 py-4", children: [
+              children && /* @__PURE__ */ jsx("div", { id: cuerpoId, className: "text-[14px] leading-relaxed text-ink", children }),
+              reason && /* @__PURE__ */ jsxs("label", { className: "block", children: [
+                /* @__PURE__ */ jsxs("span", { className: "mb-1 block text-caption font-medium text-ink", children: [
+                  reason.label,
+                  reason.required && /* @__PURE__ */ jsx("span", { className: "font-normal text-subtle", children: " (obligatorio)" })
+                ] }),
+                /* @__PURE__ */ jsx(
+                  "textarea",
+                  {
+                    "data-foco": "motivo",
+                    value: texto,
+                    onChange: (e) => setTexto(e.target.value),
+                    onKeyDown: (e) => {
+                      if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) confirmar();
+                    },
+                    rows: 3,
+                    placeholder: reason.placeholder,
+                    disabled: ocupado,
+                    className: "w-full rounded-md border border-line bg-white px-3 py-2 text-body text-ink placeholder:text-neutro-300 focus:border-rojo-300 focus:outline-none focus:ring-2 focus:ring-rojo-300"
+                  }
+                )
+              ] }),
+              errorVisible && /* @__PURE__ */ jsx("p", { role: "alert", className: "rounded-md border border-line bg-neutro-50 px-3 py-2 text-caption font-medium text-rojo-700", children: errorVisible }),
+              /* @__PURE__ */ jsxs("div", { className: "flex flex-col-reverse gap-2 sm:flex-row sm:justify-end", children: [
+                /* @__PURE__ */ jsx(Button, { "data-foco": "cancelar", variant: "secondary", onClick: cancelar, disabled: ocupado, children: cancelLabel }),
+                /* @__PURE__ */ jsx(
+                  Button,
+                  {
+                    "data-foco": "confirmar",
+                    variant: tone === "danger" ? "danger" : "primary",
+                    onClick: confirmar,
+                    disabled: ocupado || !motivoListo,
+                    children: ocupado ? "Procesando\u2026" : confirmLabel
+                  }
+                )
+              ] })
+            ] })
+          ]
+        }
+      )
+    }
+  );
+}
+function useConfirm() {
+  const [pedido, setPedido] = useState(null);
+  const confirm = useCallback(
+    (options) => new Promise((resolver) => {
+      setPedido({ ...options, resolver });
+    }),
+    []
+  );
+  const cerrar = (r) => {
+    pedido?.resolver(r);
+    setPedido(null);
+  };
+  const dialog = /* @__PURE__ */ jsx(
+    ConfirmDialog,
+    {
+      open: pedido !== null,
+      title: pedido?.title ?? "",
+      confirmLabel: pedido?.confirmLabel,
+      cancelLabel: pedido?.cancelLabel,
+      tone: pedido?.tone,
+      reason: pedido?.reason,
+      onConfirm: (reason) => cerrar({ confirmed: true, reason }),
+      onCancel: () => cerrar({ confirmed: false, reason: "" }),
+      children: pedido?.message
+    }
+  );
+  return [confirm, dialog];
+}
+var entero = (v, minimo) => Number.isFinite(v) ? Math.max(minimo, Math.floor(v)) : minimo;
+function paginationRange(total, pageSize, offset, siblings = 1) {
+  const filas = entero(total, 0);
+  const tam = entero(pageSize, 1);
+  const pages = Math.max(1, Math.ceil(filas / tam));
+  const page = Math.min(pages, Math.floor(entero(offset, 0) / tam) + 1);
+  const from = filas === 0 ? 0 : (page - 1) * tam + 1;
+  const to = Math.min(filas, page * tam);
+  const visibles = /* @__PURE__ */ new Set([1, pages]);
+  for (let p = page - siblings; p <= page + siblings; p++) if (p >= 1 && p <= pages) visibles.add(p);
+  const ordenadas = [...visibles].sort((a, b) => a - b);
+  const items = [];
+  ordenadas.forEach((p, i) => {
+    const anterior = ordenadas[i - 1];
+    if (anterior !== void 0 && p - anterior === 2) items.push(anterior + 1);
+    else if (anterior !== void 0 && p - anterior > 2) items.push("\u2026");
+    items.push(p);
+  });
+  return { page, pages, from, to, items };
+}
+var miles = (n) => n.toLocaleString("es-BO");
+function Pagination({
+  total,
+  pageSize,
+  offset,
+  onChange,
+  itemLabel = ["registro", "registros"],
+  disabled = false,
+  className
+}) {
+  const r = paginationRange(total, pageSize, offset);
+  const tam = entero(pageSize, 1);
+  const nombre = entero(total, 0) === 1 ? itemLabel[0] : itemLabel[1];
+  const ir = (pagina) => {
+    if (disabled || pagina < 1 || pagina > r.pages || pagina === r.page) return;
+    onChange((pagina - 1) * tam);
+  };
+  return /* @__PURE__ */ jsxs(
+    "nav",
+    {
+      "aria-label": "Paginaci\xF3n",
+      className: cn("flex flex-wrap items-center justify-between gap-x-4 gap-y-2 py-3 text-caption text-subtle", className),
+      children: [
+        /* @__PURE__ */ jsx("p", { className: "tnum", "aria-live": "polite", children: r.pages === 1 ? `${miles(entero(total, 0))} ${nombre}` : `Mostrando ${miles(r.from)}\u2013${miles(r.to)} de ${miles(entero(total, 0))} ${nombre}` }),
+        r.pages > 1 && /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-1", children: [
+          /* @__PURE__ */ jsx(
+            Button,
+            {
+              variant: "secondary",
+              size: "sm",
+              onClick: () => ir(r.page - 1),
+              disabled: disabled || r.page === 1,
+              "aria-label": "P\xE1gina anterior",
+              children: "Anterior"
+            }
+          ),
+          /* @__PURE__ */ jsxs("span", { className: "tnum px-2 sm:hidden", children: [
+            "P\xE1gina ",
+            miles(r.page),
+            " de ",
+            miles(r.pages)
+          ] }),
+          /* @__PURE__ */ jsx("span", { className: "hidden items-center gap-1 sm:flex", children: r.items.map(
+            (p, i) => p === "\u2026" ? /* @__PURE__ */ jsx("span", { className: "px-1", "aria-hidden": true, children: "\u2026" }, `hueco-${i}`) : /* @__PURE__ */ jsx(
+              "button",
+              {
+                type: "button",
+                onClick: () => ir(p),
+                disabled,
+                "aria-label": `P\xE1gina ${p}`,
+                "aria-current": p === r.page ? "page" : void 0,
+                className: cn(
+                  "tnum h-8 min-w-[2rem] rounded-md px-2 text-caption font-medium transition-colors",
+                  "[@media(pointer:coarse)]:min-h-[44px] [@media(pointer:coarse)]:min-w-[44px]",
+                  "disabled:pointer-events-none disabled:opacity-50",
+                  p === r.page ? "bg-neutro-100 text-brand" : "text-ink hover:bg-neutro-50"
+                ),
+                children: miles(p)
+              },
+              p
+            )
+          ) }),
+          /* @__PURE__ */ jsx(
+            Button,
+            {
+              variant: "secondary",
+              size: "sm",
+              onClick: () => ir(r.page + 1),
+              disabled: disabled || r.page === r.pages,
+              "aria-label": "P\xE1gina siguiente",
+              children: "Siguiente"
+            }
+          )
+        ] })
+      ]
+    }
+  );
+}
 
-export { AppsMenu, Badge, Button, Card, CardBody, CardHeader, CenteredSpinner, CollapsibleCard, DataTable, EmptyState, HUB_URL, Input, Logo, MODULOS_ENERSOL, MobileMenu, MobileMenuSection, Modal, PageHeader, Select, Spinner, cn, mobileMenuItemClass };
+export { AppHeader, AppsMenu, Badge, Button, Card, CardBody, CardHeader, CenteredSpinner, CollapsibleCard, ConfirmDialog, DataTable, EmptyState, HUB_URL, Input, Logo, MODULOS_ENERSOL, MobileMenu, MobileMenuSection, Modal, PageHeader, Pagination, Select, Spinner, cn, groupAppHeaderItems, isAppHeaderItemActive, mobileMenuItemClass, paginationRange, useConfirm };
