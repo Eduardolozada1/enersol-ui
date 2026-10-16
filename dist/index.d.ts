@@ -171,4 +171,165 @@ declare function MobileMenuSection({ children }: {
     children: ReactNode;
 }): react.JSX.Element;
 
-export { AppsMenu, Badge, type BadgeTone, Button, type ButtonSize, type ButtonVariant, Card, CardBody, CardHeader, CenteredSpinner, CollapsibleCard, type Column, DataTable, EmptyState, HUB_URL, Input, Logo, type LogoVariant, MODULOS_ENERSOL, MobileMenu, MobileMenuSection, Modal, type ModuloEnersol, PageHeader, Select, Spinner, cn, mobileMenuItemClass };
+/** Una sección del módulo. Sin `group` va en la barra; con `group`, en el desplegable «Más»
+ *  (escritorio) bajo el título del grupo, y en el menú ☰ del celular bajo ese mismo título.
+ *  Así un módulo con muchas secciones nunca necesita scroll lateral en el encabezado. */
+type AppHeaderItem = {
+    href: string;
+    label: ReactNode;
+    group?: string;
+    /** Otras rutas que también marcan la sección como actual (p. ej. "/" para el Tablero). */
+    match?: (path: string) => boolean;
+};
+/** Props que recibe `renderLink`: el módulo arma el link con SU router (Link, NavLink…). */
+type AppHeaderLinkProps = {
+    href: string;
+    className: string;
+    children: ReactNode;
+    "aria-current"?: "page";
+    role?: string;
+    onClick?: () => void;
+};
+/** Desde qué ancho se ve la barra de escritorio; por debajo, el menú ☰. Clases escritas
+ *  enteras (no armadas) para que Tailwind las encuentre al escanear el paquete. */
+type AppHeaderBreakpoint = "lg" | "xl" | "2xl";
+/** ¿La ruta actual es esta sección? Exacta o una subruta («/ventas» y «/ventas/12»), más
+ *  lo que diga `match`. «/» solo es actual en «/». */
+declare function isAppHeaderItemActive(item: AppHeaderItem, path: string): boolean;
+/** Agrupa las secciones: las de la barra y los grupos del «Más», en el orden en que vienen. */
+declare function groupAppHeaderItems(items: AppHeaderItem[]): {
+    main: AppHeaderItem[];
+    groups: Array<[string, AppHeaderItem[]]>;
+};
+/** Encabezado unificado del ecosistema Enersol (blanco, `border-b`, Apps + logo h-7 +
+ *  separador + nombre del módulo, navegación en texto con la actual en `text-brand`, sin
+ *  pastillas; a la derecha las acciones, el usuario y «Salir»).
+ *
+ *  Por debajo de `desktopFrom` (por defecto `lg`) la barra se reemplaza por el menú ☰
+ *  (MobileMenu) con TODAS las secciones agrupadas, el usuario y «Salir»: en el celular
+ *  nunca hay scroll lateral. Las secciones con `group` van en el desplegable «Más» de la
+ *  barra de escritorio. Sin dependencias de router: cada módulo pasa `renderLink`. */
+declare function AppHeader({ moduleKey, moduleName, logo, homeHref, items, currentPath, renderLink, notice, persistentActions, actions, user, onLogout, mobileMenuFooter, desktopFrom, moreLabel, hubUrl, className, }: {
+    /** Clave del módulo en el menú Apps (p. ej. "contabilidad"). */
+    moduleKey: string;
+    moduleName: ReactNode;
+    /** El imagotipo del módulo (h-7), tal como lo entrega la marca. */
+    logo: ReactNode;
+    homeHref?: string;
+    items: AppHeaderItem[];
+    currentPath: string;
+    renderLink?: (props: AppHeaderLinkProps) => ReactNode;
+    /** Aviso arriba de todo (p. ej. «tu usuario no tiene permisos»): en ámbar, no es un error. */
+    notice?: ReactNode;
+    /** Visibles en escritorio Y en el celular (mensajes, guía ❓). */
+    persistentActions?: ReactNode;
+    /** Solo en la barra de escritorio (en el celular van en `mobileMenuFooter`). */
+    actions?: ReactNode;
+    user?: {
+        name: ReactNode;
+        email?: string;
+    } | null;
+    onLogout?: () => void;
+    /** Filas extra al pie del menú ☰ (usar `mobileMenuItemClass()`; `data-cierra` lo cierra). */
+    mobileMenuFooter?: ReactNode;
+    desktopFrom?: AppHeaderBreakpoint;
+    moreLabel?: ReactNode;
+    hubUrl?: string;
+    className?: string;
+}): react.JSX.Element;
+
+/** Tono de la confirmación: "primary" para confirmar algo normal (registrar, aprobar) y
+ *  "danger" para lo destructivo o irreversible (anular, revertir, borrar): solo ahí el botón
+ *  va en rojo, y el foco arranca en «Cancelar». */
+type ConfirmTone = "primary" | "danger";
+/** Motivo escrito obligatorio u opcional (anulaciones, reaperturas): queda en auditoría. */
+type ConfirmReason = {
+    label: ReactNode;
+    placeholder?: string;
+    /** Si es obligatorio, «Confirmar» no se habilita hasta que tenga `minLength` letras. */
+    required?: boolean;
+    minLength?: number;
+};
+/** Diálogo de confirmación del ecosistema: reemplaza a window.confirm / window.prompt.
+ *  Dice qué va a pasar, pide el motivo si hace falta y, si `onConfirm` devuelve una
+ *  promesa, muestra «Procesando…» y bloquea los botones hasta que termine (un doble clic
+ *  no manda dos veces); si la promesa falla, el error se ve en el diálogo y sigue abierto.
+ *  Escape o tocar afuera cancelan (salvo mientras procesa); el foco queda adentro (Tab da
+ *  la vuelta) y al cerrar vuelve a donde estaba. En el celular es una hoja que sube desde
+ *  abajo, como Modal. */
+declare function ConfirmDialog({ open, title, children, confirmLabel, cancelLabel, tone, reason, busy, error, onConfirm, onCancel, }: {
+    open: boolean;
+    title: ReactNode;
+    /** Qué va a pasar y qué no se puede deshacer. */
+    children?: ReactNode;
+    confirmLabel?: ReactNode;
+    cancelLabel?: ReactNode;
+    tone?: ConfirmTone;
+    reason?: ConfirmReason;
+    /** Procesando desde afuera (además del estado propio cuando onConfirm es async). */
+    busy?: boolean;
+    /** Error que viene de afuera (además del que captura de onConfirm). */
+    error?: ReactNode;
+    onConfirm: (reason: string) => void | Promise<unknown>;
+    onCancel: () => void;
+}): react.JSX.Element | null;
+type ConfirmOptions = {
+    title: ReactNode;
+    message?: ReactNode;
+    confirmLabel?: ReactNode;
+    cancelLabel?: ReactNode;
+    tone?: ConfirmTone;
+    reason?: ConfirmReason;
+};
+/** Resultado de `confirm(...)`: si confirmó y el motivo escrito (vacío si no se pidió). */
+type ConfirmResult = {
+    confirmed: boolean;
+    reason: string;
+};
+/** Confirmación como promesa, para reemplazar `window.confirm` / `window.prompt` sin armar
+ *  estado en cada pantalla:
+ *
+ *    const [confirm, dialog] = useConfirm();
+ *    const r = await confirm({ title: "¿Anular la venta?", tone: "danger", reason: { label: "Motivo", required: true } });
+ *    if (r.confirmed) await api.post(..., { motivo: r.reason });
+ *    …
+ *    return <>{dialog}…</>;
+ *
+ *  La acción corre DESPUÉS de cerrar el diálogo: sus errores los muestra la pantalla. */
+declare function useConfirm(): [(options: ConfirmOptions) => Promise<ConfirmResult>, ReactNode];
+
+/** Página de un listado: qué filas se ven y qué botones de página dibujar. Función pura
+ *  (sin React) para que cada módulo la pueda usar y probar igual que el componente. */
+type PaginationRange = {
+    /** Página actual, desde 1. */
+    page: number;
+    /** Cantidad de páginas (al menos 1, aunque no haya filas). */
+    pages: number;
+    /** Número (desde 1) de la primera fila que se ve; 0 si no hay filas. */
+    from: number;
+    /** Número de la última fila que se ve. */
+    to: number;
+    /** Botones de página a dibujar: números y "…" donde se saltan páginas. */
+    items: Array<number | "…">;
+};
+declare function paginationRange(total: number, pageSize: number, offset: number, siblings?: number): PaginationRange;
+/** Paginación de un listado con total: «Mostrando 51–100 de 251 ventas» y los botones
+ *  Anterior / páginas / Siguiente. Trabaja con `offset` (desplazamiento) y `pageSize`
+ *  (límite), igual que la API: `onChange` recibe el nuevo desplazamiento.
+ *
+ *  En el celular (< 640 px) los números de página se reemplazan por «Página 2 de 6» para
+ *  que nunca haya scroll lateral; los botones miden 44 px con puntero táctil. Con una sola
+ *  página solo se muestra el total. */
+declare function Pagination({ total, pageSize, offset, onChange, itemLabel, disabled, className, }: {
+    total: number;
+    pageSize: number;
+    offset: number;
+    onChange: (offset: number) => void;
+    /** Cómo se llaman las filas, en singular y plural: ["venta", "ventas"]. */
+    itemLabel?: [string, string];
+    /** Mientras carga la página nueva, para no pedir dos a la vez. */
+    disabled?: boolean;
+    className?: string;
+}): react.JSX.Element;
+
+export { AppHeader, type AppHeaderBreakpoint, type AppHeaderItem, type AppHeaderLinkProps, AppsMenu, Badge, type BadgeTone, Button, type ButtonSize, type ButtonVariant, Card, CardBody, CardHeader, CenteredSpinner, CollapsibleCard, type Column, ConfirmDialog, type ConfirmOptions, type ConfirmReason, type ConfirmResult, type ConfirmTone, DataTable, EmptyState, HUB_URL, Input, Logo, type LogoVariant, MODULOS_ENERSOL, MobileMenu, MobileMenuSection, Modal, type ModuloEnersol, PageHeader, Pagination, type PaginationRange, Select, Spinner, cn, groupAppHeaderItems, isAppHeaderItemActive, mobileMenuItemClass, paginationRange, useConfirm };
