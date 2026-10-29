@@ -12,7 +12,7 @@ var BUTTON_VARIANTS = {
   primary: "bg-brand text-brand-on hover:bg-brand-hover focus-visible:ring-brand-ring",
   secondary: "bg-white text-ink border border-line hover:bg-neutro-50 focus-visible:ring-neutro-200",
   ghost: "bg-transparent text-ink hover:bg-neutro-100 focus-visible:ring-neutro-200",
-  danger: "bg-rojo-600 text-white hover:bg-rojo-700 focus-visible:ring-rojo-300"
+  danger: "bg-rojo-600 text-white hover:bg-rojo-700 focus-visible:ring-rojo-400"
 };
 var BUTTON_SIZES = {
   sm: "h-8 px-3 text-caption",
@@ -53,9 +53,9 @@ function CardBody({ className, ...props }) {
 var BADGE_TONES = {
   neutro: "bg-neutro-100 text-neutro-900 border border-neutro-200",
   rojo: "bg-rojo-600 text-white",
-  verde: "bg-verde-100 text-verde-600 border border-verde-300",
+  verde: "bg-verde-100 text-verde-700 border border-verde-300",
   atencion: "bg-ambar-100 text-ambar-700 border border-ambar-300",
-  marca: "bg-white text-brand-badge border border-brand-ring"
+  marca: "bg-white text-brand-badge border border-brand-line"
 };
 function Badge({
   tone = "neutro",
@@ -79,9 +79,9 @@ function Input({ className, ...props }) {
     "input",
     {
       className: cn(
-        "h-10 w-full rounded-md border border-line bg-white px-3 text-body text-ink",
+        "h-10 w-full rounded-md border border-neutro-500 bg-white px-3 text-body text-ink",
         TACTIL,
-        "placeholder:text-neutro-300",
+        "placeholder:text-neutro-700",
         "focus:outline-none focus:ring-2 focus:ring-brand-ring focus:border-brand-ring",
         className
       ),
@@ -94,7 +94,7 @@ function Select({ className, ...props }) {
     "select",
     {
       className: cn(
-        "h-9 rounded-md border border-line bg-white px-3 text-base sm:text-caption text-ink",
+        "h-9 rounded-md border border-neutro-500 bg-white px-3 text-base sm:text-caption text-ink",
         TACTIL,
         "focus:outline-none focus:ring-2 focus:ring-brand-ring",
         className
@@ -338,7 +338,7 @@ function DataTable({
                   const [key, dir] = e.target.value.split(":");
                   setSort(key ? { key, dir } : null);
                 },
-                className: "min-h-[44px] min-w-0 flex-1 rounded-md border border-line bg-white px-2 text-base text-ink",
+                className: "min-h-[44px] min-w-0 flex-1 rounded-md border border-neutro-500 bg-white px-2 text-base text-ink",
                 children: [
                   /* @__PURE__ */ jsxRuntime.jsx("option", { value: "", children: "Como vienen" }),
                   ordenables.map((c) => /* @__PURE__ */ jsxRuntime.jsxs("optgroup", { label: typeof c.header === "string" ? c.header : c.key, children: [
@@ -914,7 +914,7 @@ function ConfirmDialog({
                     rows: 3,
                     placeholder: reason.placeholder,
                     disabled: ocupado,
-                    className: "w-full rounded-md border border-line bg-white px-3 py-2 text-body text-ink placeholder:text-neutro-300 focus:border-brand-ring focus:outline-none focus:ring-2 focus:ring-brand-ring"
+                    className: "w-full rounded-md border border-neutro-500 bg-white px-3 py-2 text-body text-ink placeholder:text-neutro-700 focus:border-brand-ring focus:outline-none focus:ring-2 focus:ring-brand-ring"
                   }
                 )
               ] }),
@@ -1594,7 +1594,7 @@ function NuevoMensaje({
           onChange: (e) => setQ(e.target.value),
           placeholder: "\xBFA qui\xE9n le escrib\xEDs?",
           "aria-label": "\xBFA qui\xE9n le escrib\xEDs?",
-          className: "min-w-0 flex-1 rounded-md border border-line px-2 py-1.5 text-[16px] text-ink focus:outline-none focus:ring-2 focus:ring-brand-ring sm:text-caption"
+          className: "min-w-0 flex-1 rounded-md border border-neutro-500 px-2 py-1.5 text-[16px] text-ink placeholder:text-neutro-700 focus:outline-none focus:ring-2 focus:ring-brand-ring sm:text-caption"
         }
       ),
       /* @__PURE__ */ jsxRuntime.jsx(
@@ -1705,7 +1705,7 @@ function ChatView({
           },
           placeholder: "Escrib\xED un mensaje\u2026",
           "aria-label": "Escrib\xED un mensaje",
-          className: "min-w-0 flex-1 rounded-md border border-line px-3 py-2 text-[16px] text-ink focus:outline-none focus:ring-2 focus:ring-brand-ring sm:text-caption"
+          className: "min-w-0 flex-1 rounded-md border border-neutro-500 px-3 py-2 text-[16px] text-ink placeholder:text-neutro-700 focus:outline-none focus:ring-2 focus:ring-brand-ring sm:text-caption"
         }
       ),
       /* @__PURE__ */ jsxRuntime.jsx(
@@ -1871,7 +1871,7 @@ function SugerenciaModal({
           onChange: (e) => setDescripcion(e.target.value),
           rows: 5,
           placeholder: tipo === "error" ? "Qu\xE9 hiciste, qu\xE9 esperabas y qu\xE9 pas\xF3\u2026" : "Qu\xE9 te gustar\xEDa que haga o cambie\u2026",
-          className: "w-full rounded-md border border-line px-3 py-2 text-[16px] text-ink placeholder:text-neutro-300 focus:outline-none focus:ring-2 focus:ring-brand-ring sm:text-[14px]"
+          className: "w-full rounded-md border border-neutro-500 px-3 py-2 text-[16px] text-ink placeholder:text-neutro-700 focus:outline-none focus:ring-2 focus:ring-brand-ring sm:text-[14px]"
         }
       )
     ] }),
@@ -2023,7 +2023,7 @@ function GuiaPanel({
                 {
                   value: elegida?.id ?? "",
                   onChange: (e) => setId(e.target.value),
-                  className: "mt-1 h-10 max-w-full rounded-md border border-line bg-white px-1.5 text-[16px] text-ink sm:h-7 sm:text-[11px]",
+                  className: "mt-1 h-10 max-w-full rounded-md border border-neutro-500 bg-white px-1.5 text-[16px] text-ink sm:h-7 sm:text-[11px]",
                   "aria-label": "Ver la gu\xEDa de otra pantalla",
                   children: visibles.map((x) => /* @__PURE__ */ jsxRuntime.jsx("option", { value: x.id, children: x.titulo }, x.id))
                 }

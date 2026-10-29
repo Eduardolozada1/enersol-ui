@@ -236,7 +236,7 @@ export function GuiaPanel({
               <select
                 value={elegida?.id ?? ""}
                 onChange={(e) => setId(e.target.value)}
-                className="mt-1 h-10 max-w-full rounded-md border border-line bg-white px-1.5 text-[16px] text-ink sm:h-7 sm:text-[11px]"
+                className="mt-1 h-10 max-w-full rounded-md border border-neutro-500 bg-white px-1.5 text-[16px] text-ink sm:h-7 sm:text-[11px]"
                 aria-label="Ver la guía de otra pantalla"
               >
                 {visibles.map((x) => (

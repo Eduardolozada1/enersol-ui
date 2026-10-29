@@ -456,7 +456,7 @@ function NuevoMensaje({
           onChange={(e) => setQ(e.target.value)}
           placeholder="¿A quién le escribís?"
           aria-label="¿A quién le escribís?"
-          className="min-w-0 flex-1 rounded-md border border-line px-2 py-1.5 text-[16px] text-ink focus:outline-none focus:ring-2 focus:ring-brand-ring sm:text-caption"
+          className="min-w-0 flex-1 rounded-md border border-neutro-500 px-2 py-1.5 text-[16px] text-ink placeholder:text-neutro-700 focus:outline-none focus:ring-2 focus:ring-brand-ring sm:text-caption"
         />
         <button
           type="button"
@@ -580,7 +580,7 @@ function ChatView({
           }}
           placeholder="Escribí un mensaje…"
           aria-label="Escribí un mensaje"
-          className="min-w-0 flex-1 rounded-md border border-line px-3 py-2 text-[16px] text-ink focus:outline-none focus:ring-2 focus:ring-brand-ring sm:text-caption"
+          className="min-w-0 flex-1 rounded-md border border-neutro-500 px-3 py-2 text-[16px] text-ink placeholder:text-neutro-700 focus:outline-none focus:ring-2 focus:ring-brand-ring sm:text-caption"
         />
         <button
           type="button"
