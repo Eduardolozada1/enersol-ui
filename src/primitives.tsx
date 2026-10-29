@@ -7,7 +7,7 @@ export type ButtonSize = "sm" | "md";
 
 const BUTTON_VARIANTS: Record<ButtonVariant, string> = {
   // Rojo manda pero no satura: primario sólido, el resto sobrio. UN primario por pantalla.
-  primary: "bg-brand text-white hover:bg-brand-fg focus-visible:ring-rojo-300",
+  primary: "bg-brand text-brand-on hover:bg-brand-hover focus-visible:ring-brand-ring",
   secondary: "bg-white text-ink border border-line hover:bg-neutro-50 focus-visible:ring-neutro-200",
   ghost: "bg-transparent text-ink hover:bg-neutro-100 focus-visible:ring-neutro-200",
   danger: "bg-rojo-600 text-white hover:bg-rojo-700 focus-visible:ring-rojo-300",
@@ -69,7 +69,7 @@ const BADGE_TONES: Record<BadgeTone, string> = {
   rojo: "bg-rojo-600 text-white",
   verde: "bg-verde-100 text-verde-600 border border-verde-300",
   atencion: "bg-ambar-100 text-ambar-700 border border-ambar-300",
-  marca: "bg-white text-rojo-700 border border-rojo-300",
+  marca: "bg-white text-brand-badge border border-brand-ring",
 };
 
 export function Badge({
@@ -97,7 +97,7 @@ export function Input({ className, ...props }: InputHTMLAttributes<HTMLInputElem
         "h-10 w-full rounded-md border border-line bg-white px-3 text-body text-ink",
         TACTIL,
         "placeholder:text-neutro-300",
-        "focus:outline-none focus:ring-2 focus:ring-rojo-300 focus:border-rojo-300",
+        "focus:outline-none focus:ring-2 focus:ring-brand-ring focus:border-brand-ring",
         className,
       )}
       {...props}
@@ -111,7 +111,7 @@ export function Select({ className, ...props }: SelectHTMLAttributes<HTMLSelectE
       className={cn(
         "h-9 rounded-md border border-line bg-white px-3 text-base sm:text-caption text-ink",
         TACTIL,
-        "focus:outline-none focus:ring-2 focus:ring-rojo-300",
+        "focus:outline-none focus:ring-2 focus:ring-brand-ring",
         className,
       )}
       {...props}
@@ -141,7 +141,14 @@ export function CenteredSpinner() {
 }
 
 // ── Logo ────────────────────────────────────────────────────────────────────
-export type LogoVariant = "imagotipo-color" | "imagotipo-blanco" | "isotipo-color" | "isotipo-app";
+export type LogoVariant =
+  | "imagotipo-color"
+  | "imagotipo-blanco"
+  | "isotipo-color"
+  | "isotipo-app"
+  // logo principal (bloque) de una división, p. ej. el panel del ingreso de Distribución
+  | "bloque-color"
+  | "bloque-negativo";
 
 /** Marca Enersol. Usar tal cual se entrega, sin alterar proporciones/colores (regla dura
  * del manual). Cada módulo sirve los archivos en `/brand/*.svg|png`; usa el SVG si existe

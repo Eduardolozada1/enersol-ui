@@ -42,7 +42,13 @@
   --color-amarillo: #FFC02E;
 
   --color-brand: #D62828;
+  --color-brand-on: #FFFFFF;
+  --color-brand-hover: #AB2020;
   --color-brand-fg: #AB2020;
+  --color-brand-text: #D62828;
+  --color-brand-ring: #E67E7E;
+  --color-brand-soft: #FBEAEA;
+  --color-brand-badge: #801818;
   --color-brand-strong: #801818;
   --color-ink: #494C4A;
   --color-subtle: #5F6260;

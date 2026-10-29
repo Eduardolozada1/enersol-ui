@@ -35,6 +35,17 @@ Con **Tailwind v4** (Proyectos, Contabilidad) no hay preset: los tokens van por 
 @source "../node_modules/@enersol/ui/dist";
 ```
 
+**Enersol Distribución** (submarca amarillo solar + grafito, desde la 0.5.0) usa el preset de la
+división, que extiende el base y pisa solo los alias de marca:
+
+```js
+import preset from "@enersol/ui/tailwind-preset-distribucion";   // Tailwind v3
+```
+
+```css
+@import "@enersol/ui/theme-distribucion.css";                      /* Tailwind v4 */
+```
+
 El Dockerfile del frontend necesita `git` para que `npm ci` pueda traer el paquete:
 `RUN apk add --no-cache git` antes de `npm ci` (imagen `node:20-alpine`).
 
@@ -51,6 +62,20 @@ El Dockerfile del frontend necesita `git` para que `npm ci` pueda traer el paque
 - Desde 0.3.0: `AppHeader` (encabezado unificado con menú ☰ en celular y «Más» en
   escritorio), `ConfirmDialog` + `useConfirm` (en lugar de `window.confirm`/`prompt`) y
   `Pagination` + `paginationRange` (listados con total).
+
+## Verificar un cambio del paquete: la galería
+
+`galeria/` dibuja todos los componentes (foco, hover, menús y diálogos abiertos) con la última
+etiqueta y con el árbol de trabajo, como los usan los módulos (Tailwind v3 con el preset y v4 con
+`theme.css`), en escritorio y en celular, y compara las capturas píxel a píxel. Un cambio que no
+debe verse en los módulos tiene que dar «0 distintas»:
+
+```bash
+cd galeria && npm ci && node comparar.mjs        # o --antes v0.4.0
+```
+
+Las capturas quedan en `galeria/salida/` (también las de Distribución, para mirar). Necesita
+Playwright con Chromium.
 
 ## Publicar una versión
 
@@ -237,3 +262,26 @@ const ir = destinoSeguro(next, ["https://operaciones.enersol-sa.com"]); // URL c
 Rechaza `//x`, `/\x`, tabs y saltos de línea, `javascript:`, otros dominios y URLs con
 usuario/clave; ante la duda, `"/"` (o `porDefecto`). También `rutaInterna(raw)` y
 `safeHref(raw)` (los del Hub).
+
+## 0.5.0 — Alias de marca y Enersol Distribución (29/10/2026)
+
+Nada cambia en los módulos que ya usan el paquete: la galería da las mismas capturas que la
+0.4.0 (46 de 46, Tailwind v3 y v4, escritorio y celular). Para la submarca de Distribución
+(decisión de Gerencia del 29/10/2026; Guía UX/UI de Distribución, sección 3):
+
+- **Alias de marca** en el preset y en `theme.css`, con los valores de siempre: `brand-on` (texto
+  sobre `bg-brand`), `brand-hover`, `brand-text` (ítem activo del encabezado, del menú ☰ y de la
+  paginación), `brand-ring` (anillo y borde de foco), `brand-soft` y `brand-badge` (texto del
+  Badge «marca»). Los componentes los usan en lugar de `text-white`, `text-brand`,
+  `hover:bg-brand-fg` y `ring-rojo-300`; el rojo queda para el botón destructivo y los errores.
+  Una ruta nueva o un componente nuevo usa los alias: lo controla `test/marca.test.mjs`.
+- **`AppHeader`**: `indicador="subrayado"` (la sección actual con una barra `bg-brand` de 3 px
+  pegada al borde inferior y texto `brand-text`), `mostrarApps={false}` (sin el menú de módulos:
+  para clientes externos) y `mostrarNombre={false}` (cuando el logo ya dice el nombre del módulo).
+  Por defecto, todo igual que antes.
+- `Logo`: variantes `bloque-color` y `bloque-negativo` (logo principal de una división).
+- **`tailwind-preset-distribucion.cjs` y `theme-distribucion.css`**: amarillo solar `#F9AE22` y
+  grafito `#373A3C`, con texto grafito sobre amarillo (6,1:1) y `#865904` como texto de marca
+  sobre blanco. Neutros, semánticos, letras, radios y sombras: los del ecosistema.
+- `galeria/`: la comparación píxel a píxel de arriba.
+

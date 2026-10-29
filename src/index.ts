@@ -22,7 +22,7 @@ export { AppsMenu, HUB_URL, MODULOS_ENERSOL } from "./AppsMenu";
 export { MobileMenu, MobileMenuSection, mobileMenuItemClass } from "./MobileMenu";
 export type { ModuloEnersol } from "./AppsMenu";
 export { AppHeader, groupAppHeaderItems, isAppHeaderItemActive } from "./AppHeader";
-export type { AppHeaderBreakpoint, AppHeaderItem, AppHeaderLinkProps } from "./AppHeader";
+export type { AppHeaderBreakpoint, AppHeaderIndicador, AppHeaderItem, AppHeaderLinkProps } from "./AppHeader";
 export { ConfirmDialog, useConfirm } from "./ConfirmDialog";
 export type { ConfirmOptions, ConfirmReason, ConfirmResult, ConfirmTone } from "./ConfirmDialog";
 export { Pagination, paginationRange } from "./Pagination";

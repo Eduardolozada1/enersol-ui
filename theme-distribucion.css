@@ -1,0 +1,37 @@
+/*
+ * Tokens de Enersol Distribución para Tailwind v4: los del ecosistema (theme.css) y encima los
+ * alias de marca de la división (mismos valores que tailwind-preset-distribucion.cjs). Uso:
+ *
+ *   @import "tailwindcss";
+ *   @import "@enersol/ui/theme-distribucion.css";
+ *   @source "../node_modules/@enersol/ui/dist";
+ */
+@import "./theme.css";
+
+@theme {
+  --color-amarillo: #F9AE22;
+  --color-amarillo-50: #FEF7E9;
+  --color-amarillo-100: #FEEFD3;
+  --color-amarillo-200: #FDDFA7;
+  --color-amarillo-300: #FBCA6F;
+  --color-amarillo-400: #FABA43;
+  --color-amarillo-500: #F9AE22;
+  --color-amarillo-600: #E99A06;
+  --color-amarillo-700: #B37605;
+  --color-amarillo-800: #865904;
+  --color-amarillo-900: #593B02;
+
+  --color-grafito: #373A3C;
+  --color-acero: #646D73;
+
+  --color-brand: #F9AE22;
+  --color-brand-on: #373A3C;
+  --color-brand-hover: #E99A06;
+  --color-brand-fg: #865904;
+  --color-brand-text: #373A3C;
+  --color-brand-ring: #FBCA6F;
+  --color-brand-soft: #FEF7E9;
+  --color-brand-badge: #865904;
+  --color-brand-strong: #593B02;
+  --color-ink: #373A3C;
+}

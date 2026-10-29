@@ -110,7 +110,7 @@ export function GuiaContenido({ guia }: { guia: Guia }) {
         <ol className="mt-4 space-y-3">
           {guia.pasos.map((p, i) => (
             <li key={i} className="flex gap-3">
-              <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-brand text-[11px] font-bold text-white" aria-hidden>
+              <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-brand text-[11px] font-bold text-brand-on" aria-hidden>
                 {i + 1}
               </span>
               <p className="min-w-0 text-[14px] leading-relaxed text-ink sm:text-[13px]">{conNegritas(p)}</p>
@@ -272,7 +272,7 @@ export function GuiaPanel({
                 onClick={() => setId(g.id)}
                 className={cn(
                   "rounded-pill border px-2.5 py-1 text-[12px] transition-colors sm:text-[11px] [@media(pointer:coarse)]:min-h-[40px]",
-                  elegida?.id === g.id ? "border-brand bg-brand text-white" : "border-line bg-white text-ink hover:bg-neutro-50",
+                  elegida?.id === g.id ? "border-brand bg-brand text-brand-on" : "border-line bg-white text-ink hover:bg-neutro-50",
                 )}
               >
                 {g.titulo}

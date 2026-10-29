@@ -198,7 +198,7 @@ export function SugerenciaModal({
                 onClick={() => setTipo(t)}
                 className={cn(
                   "rounded-pill border px-3 py-1.5 text-[13px] [@media(pointer:coarse)]:min-h-[44px]",
-                  tipo === t ? "border-brand bg-brand text-white" : "border-line bg-white text-ink hover:bg-neutro-50",
+                  tipo === t ? "border-brand bg-brand text-brand-on" : "border-line bg-white text-ink hover:bg-neutro-50",
                 )}
               >
                 {t === "mejora" ? "💡 Mejora" : "🐞 Error"}
@@ -215,7 +215,7 @@ export function SugerenciaModal({
               onChange={(e) => setDescripcion(e.target.value)}
               rows={5}
               placeholder={tipo === "error" ? "Qué hiciste, qué esperabas y qué pasó…" : "Qué te gustaría que haga o cambie…"}
-              className="w-full rounded-md border border-line px-3 py-2 text-[16px] text-ink placeholder:text-neutro-300 focus:outline-none focus:ring-2 focus:ring-rojo-300 sm:text-[14px]"
+              className="w-full rounded-md border border-line px-3 py-2 text-[16px] text-ink placeholder:text-neutro-300 focus:outline-none focus:ring-2 focus:ring-brand-ring sm:text-[14px]"
             />
           </div>
           <div>

@@ -181,7 +181,7 @@ export function ConfirmDialog({
                 rows={3}
                 placeholder={reason.placeholder}
                 disabled={ocupado}
-                className="w-full rounded-md border border-line bg-white px-3 py-2 text-body text-ink placeholder:text-neutro-300 focus:border-rojo-300 focus:outline-none focus:ring-2 focus:ring-rojo-300"
+                className="w-full rounded-md border border-line bg-white px-3 py-2 text-body text-ink placeholder:text-neutro-300 focus:border-brand-ring focus:outline-none focus:ring-2 focus:ring-brand-ring"
               />
             </label>
           )}
