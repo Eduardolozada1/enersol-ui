@@ -1,14 +1,17 @@
 import { useEffect, useRef, useState } from "react";
 import { cn } from "./cn";
 
-/** Los módulos del ecosistema Enersol (Distribución queda fuera). El orden es el del
- *  lanzador del Hub. Los links pasan por el Hub (`/ir/<clave>`), que emite el ticket de
- *  SSO y redirige: un solo lugar decide quién entra a qué. */
+/** Los módulos del ecosistema Enersol. El orden es el del lanzador del Hub. Los links pasan
+ *  por el Hub (`/ir/<clave>`), que emite el ticket de SSO y redirige: un solo lugar decide quién
+ *  entra a qué. */
 export type ModuloEnersol = {
   clave: string;
   nombre: string;
   url: string;
   descripcion: string;
+  /** Solo se lista a quien tiene el módulo habilitado en el Hub (`accesos` del menú) y en el
+   *  propio módulo. Distribución: admin, contabilidad y sus ejecutivos (Eduardo, 29/10/2026). */
+  soloConAcceso?: boolean;
 };
 
 export const HUB_URL = "https://app.enersol-sa.com";
@@ -20,7 +23,25 @@ export const MODULOS_ENERSOL: ModuloEnersol[] = [
   { clave: "marketing", nombre: "Marketing", url: "https://marketing.enersol-sa.com", descripcion: "Funnel, campañas y mensajería" },
   { clave: "contabilidad", nombre: "Contabilidad", url: "https://contabilidad.enersol-sa.com", descripcion: "Contable, inventario y tesorería" },
   { clave: "financiamiento", nombre: "Cuotas", url: "https://cuotas.enersol-sa.com", descripcion: "Pago en cuotas y cobranza" },
+  {
+    clave: "distribucion",
+    nombre: "Distribución",
+    url: "https://distribucion.enersol-sa.com",
+    descripcion: "Portal mayorista para instaladores",
+    soloConAcceso: true,
+  },
 ];
+
+/** Los módulos que ve esta persona: los de siempre, y los `soloConAcceso` si los tiene
+ *  habilitados (`accesos`, claves del Hub) o si está en ese módulo. Sin `accesos`, ninguno de
+ *  esos: el módulo que no sabe los accesos de la persona no los muestra. */
+export function modulosVisibles(
+  modulos: ModuloEnersol[],
+  actual: string,
+  accesos?: readonly string[] | null,
+): ModuloEnersol[] {
+  return modulos.filter((m) => !m.soloConAcceso || m.clave === actual || !!accesos?.includes(m.clave));
+}
 
 /** Menú «Apps»: saltar entre módulos sin volver al lanzador. Va junto al logo en el
  *  header de cada módulo. Los destinos pasan por el Hub para el SSO. */
@@ -28,12 +49,16 @@ export function AppsMenu({
   actual,
   hubUrl = HUB_URL,
   modulos = MODULOS_ENERSOL,
+  accesos,
   className,
 }: {
   /** Clave del módulo donde estamos (se marca y no linkea). */
   actual: string;
   hubUrl?: string;
   modulos?: ModuloEnersol[];
+  /** Claves de los módulos que la persona tiene habilitados en el Hub (las del lanzador). Hace
+   *  falta para listar los `soloConAcceso`; sin ella, esos no se muestran. */
+  accesos?: readonly string[] | null;
   className?: string;
 }) {
   const [abierto, setAbierto] = useState(false);
@@ -80,7 +105,7 @@ export function AppsMenu({
           className="absolute left-0 top-full z-30 mt-2 w-72 max-w-[calc(100vw-1.5rem)] rounded-card border border-line bg-surface p-1.5 shadow-card"
         >
           <div className="px-2.5 pb-1.5 pt-1 text-[11px] font-semibold uppercase tracking-wide text-subtle">Módulos</div>
-          {modulos.map((m) => {
+          {modulosVisibles(modulos, actual, accesos).map((m) => {
             const esActual = m.clave === actual;
             const href = m.clave === "plataforma" ? hubUrl : `${hubUrl}/ir/${m.clave}`;
             return (

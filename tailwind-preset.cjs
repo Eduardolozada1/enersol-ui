@@ -54,20 +54,23 @@ module.exports = {
           300: "#A9BE67",
           500: "#709302",
           600: "#5A7602",
+          700: "#4D6502", // texto sobre verde-100 (5,3:1) y sobre blanco (6,6:1) · Badge «verde»
         },
         // Amarillo Enersol (escenario "gas" en Proyectos)
         amarillo: { DEFAULT: "#FFC02E" },
         // Alias semánticos (lo que se usa en la UI). Los componentes del paquete usan SOLO estos
         // alias para la identidad: una división con otra marca pisa los alias en su preset
         // (tailwind-preset-distribucion.cjs) y los componentes la toman sin cambiar. Los valores de
-        // acá reproducen exactamente las clases de antes de la 0.5.0 (nada cambia en los módulos).
+        // acá reproducen las clases de antes de la 0.5.0, salvo el foco (`ring`), que en la 0.6.0
+        // pasó a rojo-400 por contraste.
         brand: {
           DEFAULT: "#D62828", // relleno de identidad (botón principal, contadores)
           on: "#FFFFFF", // texto o ícono SOBRE bg-brand
           hover: "#AB2020", // hover del relleno
           fg: "#AB2020", // texto de marca sobre blanco (enlaces)
           text: "#D62828", // ítem activo del encabezado, del menú y de la paginación
-          ring: "#E67E7E", // anillo y borde de foco (= rojo-300)
+          ring: "#DE5353", // anillo y borde de foco (= rojo-400; 3,8:1 sobre blanco, WCAG 2.2 pide 3:1)
+          line: "#E67E7E", // contorno del Badge «marca» (= rojo-300; el de antes del foco)
           soft: "#FBEAEA", // fondo suave de marca (= rojo-50)
           badge: "#801818", // texto del Badge «marca» (= rojo-700)
           strong: "#801818",

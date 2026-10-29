@@ -215,7 +215,7 @@ export function SugerenciaModal({
               onChange={(e) => setDescripcion(e.target.value)}
               rows={5}
               placeholder={tipo === "error" ? "Qué hiciste, qué esperabas y qué pasó…" : "Qué te gustaría que haga o cambie…"}
-              className="w-full rounded-md border border-line px-3 py-2 text-[16px] text-ink placeholder:text-neutro-300 focus:outline-none focus:ring-2 focus:ring-brand-ring sm:text-[14px]"
+              className="w-full rounded-md border border-neutro-500 px-3 py-2 text-[16px] text-ink placeholder:text-neutro-700 focus:outline-none focus:ring-2 focus:ring-brand-ring sm:text-[14px]"
             />
           </div>
           <div>

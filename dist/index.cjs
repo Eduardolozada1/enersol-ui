@@ -12,7 +12,7 @@ var BUTTON_VARIANTS = {
   primary: "bg-brand text-brand-on hover:bg-brand-hover focus-visible:ring-brand-ring",
   secondary: "bg-white text-ink border border-line hover:bg-neutro-50 focus-visible:ring-neutro-200",
   ghost: "bg-transparent text-ink hover:bg-neutro-100 focus-visible:ring-neutro-200",
-  danger: "bg-rojo-600 text-white hover:bg-rojo-700 focus-visible:ring-rojo-300"
+  danger: "bg-rojo-600 text-white hover:bg-rojo-700 focus-visible:ring-rojo-400"
 };
 var BUTTON_SIZES = {
   sm: "h-8 px-3 text-caption",
@@ -53,9 +53,9 @@ function CardBody({ className, ...props }) {
 var BADGE_TONES = {
   neutro: "bg-neutro-100 text-neutro-900 border border-neutro-200",
   rojo: "bg-rojo-600 text-white",
-  verde: "bg-verde-100 text-verde-600 border border-verde-300",
+  verde: "bg-verde-100 text-verde-700 border border-verde-300",
   atencion: "bg-ambar-100 text-ambar-700 border border-ambar-300",
-  marca: "bg-white text-brand-badge border border-brand-ring"
+  marca: "bg-white text-brand-badge border border-brand-line"
 };
 function Badge({
   tone = "neutro",
@@ -79,9 +79,9 @@ function Input({ className, ...props }) {
     "input",
     {
       className: cn(
-        "h-10 w-full rounded-md border border-line bg-white px-3 text-body text-ink",
+        "h-10 w-full rounded-md border border-neutro-500 bg-white px-3 text-body text-ink",
         TACTIL,
-        "placeholder:text-neutro-300",
+        "placeholder:text-neutro-700",
         "focus:outline-none focus:ring-2 focus:ring-brand-ring focus:border-brand-ring",
         className
       ),
@@ -94,7 +94,7 @@ function Select({ className, ...props }) {
     "select",
     {
       className: cn(
-        "h-9 rounded-md border border-line bg-white px-3 text-base sm:text-caption text-ink",
+        "h-9 rounded-md border border-neutro-500 bg-white px-3 text-base sm:text-caption text-ink",
         TACTIL,
         "focus:outline-none focus:ring-2 focus:ring-brand-ring",
         className
@@ -338,7 +338,7 @@ function DataTable({
                   const [key, dir] = e.target.value.split(":");
                   setSort(key ? { key, dir } : null);
                 },
-                className: "min-h-[44px] min-w-0 flex-1 rounded-md border border-line bg-white px-2 text-base text-ink",
+                className: "min-h-[44px] min-w-0 flex-1 rounded-md border border-neutro-500 bg-white px-2 text-base text-ink",
                 children: [
                   /* @__PURE__ */ jsxRuntime.jsx("option", { value: "", children: "Como vienen" }),
                   ordenables.map((c) => /* @__PURE__ */ jsxRuntime.jsxs("optgroup", { label: typeof c.header === "string" ? c.header : c.key, children: [
@@ -443,12 +443,23 @@ var MODULOS_ENERSOL = [
   { clave: "propuestas", nombre: "Proyectos", url: "https://propuestas.enersol-sa.com", descripcion: "Cotizador, propuestas y CRM" },
   { clave: "marketing", nombre: "Marketing", url: "https://marketing.enersol-sa.com", descripcion: "Funnel, campa\xF1as y mensajer\xEDa" },
   { clave: "contabilidad", nombre: "Contabilidad", url: "https://contabilidad.enersol-sa.com", descripcion: "Contable, inventario y tesorer\xEDa" },
-  { clave: "financiamiento", nombre: "Cuotas", url: "https://cuotas.enersol-sa.com", descripcion: "Pago en cuotas y cobranza" }
+  { clave: "financiamiento", nombre: "Cuotas", url: "https://cuotas.enersol-sa.com", descripcion: "Pago en cuotas y cobranza" },
+  {
+    clave: "distribucion",
+    nombre: "Distribuci\xF3n",
+    url: "https://distribucion.enersol-sa.com",
+    descripcion: "Portal mayorista para instaladores",
+    soloConAcceso: true
+  }
 ];
+function modulosVisibles(modulos, actual, accesos) {
+  return modulos.filter((m) => !m.soloConAcceso || m.clave === actual || !!accesos?.includes(m.clave));
+}
 function AppsMenu({
   actual,
   hubUrl = HUB_URL,
   modulos = MODULOS_ENERSOL,
+  accesos,
   className
 }) {
   const [abierto, setAbierto] = react.useState(false);
@@ -501,7 +512,7 @@ function AppsMenu({
         className: "absolute left-0 top-full z-30 mt-2 w-72 max-w-[calc(100vw-1.5rem)] rounded-card border border-line bg-surface p-1.5 shadow-card",
         children: [
           /* @__PURE__ */ jsxRuntime.jsx("div", { className: "px-2.5 pb-1.5 pt-1 text-[11px] font-semibold uppercase tracking-wide text-subtle", children: "M\xF3dulos" }),
-          modulos.map((m) => {
+          modulosVisibles(modulos, actual, accesos).map((m) => {
             const esActual = m.clave === actual;
             const href = m.clave === "plataforma" ? hubUrl : `${hubUrl}/ir/${m.clave}`;
             return /* @__PURE__ */ jsxRuntime.jsxs(
@@ -715,6 +726,7 @@ function AppHeader({
   desktopFrom = "lg",
   moreLabel = "M\xE1s",
   hubUrl = HUB_URL,
+  accesos,
   indicador = "texto",
   mostrarApps = true,
   mostrarNombre = true,
@@ -735,7 +747,7 @@ function AppHeader({
     notice && /* @__PURE__ */ jsxRuntime.jsx("div", { role: "status", className: "border-b border-ambar-300 bg-ambar-100 px-4 py-2 text-center text-[13px] font-medium text-ambar-700", children: notice }),
     /* @__PURE__ */ jsxRuntime.jsxs("div", { className: cn("flex h-16 items-center justify-between gap-2 px-3", bp.gap, bp.px), children: [
       /* @__PURE__ */ jsxRuntime.jsxs("div", { className: cn("flex min-w-0 items-center gap-2", bp.gap, indicador === "subrayado" && "self-stretch"), children: [
-        mostrarApps && /* @__PURE__ */ jsxRuntime.jsx(AppsMenu, { actual: moduleKey, hubUrl, className: "-ml-1.5 shrink-0" }),
+        mostrarApps && /* @__PURE__ */ jsxRuntime.jsx(AppsMenu, { actual: moduleKey, hubUrl, accesos, className: "-ml-1.5 shrink-0" }),
         renderLink({ href: homeHref, className: "shrink-0", children: logo }),
         mostrarNombre && /* @__PURE__ */ jsxRuntime.jsx("span", { className: cn("min-w-0 truncate font-display text-[15px] font-semibold text-neutro-900", bp.oculto), children: moduleName }),
         /* @__PURE__ */ jsxRuntime.jsx("span", { className: cn("hidden h-6 w-px shrink-0 bg-neutro-200", bp.block), "aria-hidden": true }),
@@ -914,7 +926,7 @@ function ConfirmDialog({
                     rows: 3,
                     placeholder: reason.placeholder,
                     disabled: ocupado,
-                    className: "w-full rounded-md border border-line bg-white px-3 py-2 text-body text-ink placeholder:text-neutro-300 focus:border-brand-ring focus:outline-none focus:ring-2 focus:ring-brand-ring"
+                    className: "w-full rounded-md border border-neutro-500 bg-white px-3 py-2 text-body text-ink placeholder:text-neutro-700 focus:border-brand-ring focus:outline-none focus:ring-2 focus:ring-brand-ring"
                   }
                 )
               ] }),
@@ -1594,7 +1606,7 @@ function NuevoMensaje({
           onChange: (e) => setQ(e.target.value),
           placeholder: "\xBFA qui\xE9n le escrib\xEDs?",
           "aria-label": "\xBFA qui\xE9n le escrib\xEDs?",
-          className: "min-w-0 flex-1 rounded-md border border-line px-2 py-1.5 text-[16px] text-ink focus:outline-none focus:ring-2 focus:ring-brand-ring sm:text-caption"
+          className: "min-w-0 flex-1 rounded-md border border-neutro-500 px-2 py-1.5 text-[16px] text-ink placeholder:text-neutro-700 focus:outline-none focus:ring-2 focus:ring-brand-ring sm:text-caption"
         }
       ),
       /* @__PURE__ */ jsxRuntime.jsx(
@@ -1705,7 +1717,7 @@ function ChatView({
           },
           placeholder: "Escrib\xED un mensaje\u2026",
           "aria-label": "Escrib\xED un mensaje",
-          className: "min-w-0 flex-1 rounded-md border border-line px-3 py-2 text-[16px] text-ink focus:outline-none focus:ring-2 focus:ring-brand-ring sm:text-caption"
+          className: "min-w-0 flex-1 rounded-md border border-neutro-500 px-3 py-2 text-[16px] text-ink placeholder:text-neutro-700 focus:outline-none focus:ring-2 focus:ring-brand-ring sm:text-caption"
         }
       ),
       /* @__PURE__ */ jsxRuntime.jsx(
@@ -1871,7 +1883,7 @@ function SugerenciaModal({
           onChange: (e) => setDescripcion(e.target.value),
           rows: 5,
           placeholder: tipo === "error" ? "Qu\xE9 hiciste, qu\xE9 esperabas y qu\xE9 pas\xF3\u2026" : "Qu\xE9 te gustar\xEDa que haga o cambie\u2026",
-          className: "w-full rounded-md border border-line px-3 py-2 text-[16px] text-ink placeholder:text-neutro-300 focus:outline-none focus:ring-2 focus:ring-brand-ring sm:text-[14px]"
+          className: "w-full rounded-md border border-neutro-500 px-3 py-2 text-[16px] text-ink placeholder:text-neutro-700 focus:outline-none focus:ring-2 focus:ring-brand-ring sm:text-[14px]"
         }
       )
     ] }),
@@ -2023,7 +2035,7 @@ function GuiaPanel({
                 {
                   value: elegida?.id ?? "",
                   onChange: (e) => setId(e.target.value),
-                  className: "mt-1 h-10 max-w-full rounded-md border border-line bg-white px-1.5 text-[16px] text-ink sm:h-7 sm:text-[11px]",
+                  className: "mt-1 h-10 max-w-full rounded-md border border-neutro-500 bg-white px-1.5 text-[16px] text-ink sm:h-7 sm:text-[11px]",
                   "aria-label": "Ver la gu\xEDa de otra pantalla",
                   children: visibles.map((x) => /* @__PURE__ */ jsxRuntime.jsx("option", { value: x.id, children: x.titulo }, x.id))
                 }
@@ -2147,6 +2159,7 @@ exports.iniciarSondeo = iniciarSondeo;
 exports.instalarReporteErrores = instalarReporteErrores;
 exports.isAppHeaderItemActive = isAppHeaderItemActive;
 exports.mobileMenuItemClass = mobileMenuItemClass;
+exports.modulosVisibles = modulosVisibles;
 exports.normalizarRuta = normalizarRuta;
 exports.paginationRange = paginationRange;
 exports.partirNegritas = partirNegritas;

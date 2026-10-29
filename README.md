@@ -263,6 +263,20 @@ Rechaza `//x`, `/\x`, tabs y saltos de línea, `javascript:`, otros dominios y U
 usuario/clave; ante la duda, `"/"` (o `porDefecto`). También `rutaInterna(raw)` y
 `safeHref(raw)` (los del Hub).
 
+## 0.6.0 — Contraste de campos, foco y pastilla verde (29/10/2026)
+
+Aprobado por Eduardo (29/10/2026); cambia a propósito cómo se ven los módulos que suben de
+versión. Detalle en el CHANGELOG.
+
+- Campos con borde `neutro-500` y texto de ayuda `neutro-700`.
+- Foco (`brand-ring`) en `rojo-400` (`#DE5353`); en Distribución, `amarillo-700` (`#B37605`).
+- Badge «verde» con `text-verde-700` (token nuevo `#4D6502`).
+- `brand-line`: contorno del Badge «marca» (el color de antes del foco). `brand-ring` es solo
+  para el foco.
+- Menú Apps: Distribución, solo para quien la tiene habilitada en el Hub. El módulo pasa las
+  claves del lanzador de la persona: `<AppHeader accesos={["contabilidad", "distribucion"]} … />`
+  (o `<AppsMenu accesos={…} />`); sin `accesos`, Distribución no aparece.
+
 ## 0.5.0 — Alias de marca y Enersol Distribución (29/10/2026)
 
 Nada cambia en los módulos que ya usan el paquete: la galería da las mismas capturas que la

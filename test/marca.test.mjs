@@ -1,6 +1,7 @@
 // Alias de marca (0.5.0): los componentes usan SOLO alias para la identidad, el preset base los
 // define con los valores de antes (los módulos del ecosistema se ven idénticos) y el de
-// Distribución los pisa con el amarillo solar + grafito. Correr con `npm test` (compila antes).
+// Distribución los pisa con el amarillo solar + grafito. 0.6.0: contraste del foco, de los campos y
+// del Badge «verde». Correr con `npm test` (compila antes).
 import assert from "node:assert/strict";
 import { readFileSync, readdirSync } from "node:fs";
 import { createRequire } from "node:module";
@@ -9,7 +10,7 @@ import { test } from "node:test";
 import React from "react";
 import ReactDOMServer from "react-dom/server";
 
-import { AppHeader, Badge, Button } from "../dist/index.js";
+import { AppHeader, Badge, Button, Input, MODULOS_ENERSOL, modulosVisibles } from "../dist/index.js";
 
 const require = createRequire(import.meta.url);
 const base = require("../tailwind-preset.cjs");
@@ -25,13 +26,14 @@ const coloresDistribucion = distribucion.theme.extend.colors;
 
 // ── Preset base: los alias valen exactamente lo que valían las clases de antes ──────────────
 
-test("preset base: cada alias nuevo reproduce la clase que reemplaza", () => {
+test("preset base: cada alias reproduce la clase que reemplaza (salvo el foco, 0.6.0)", () => {
   const { brand, rojo } = colores;
   assert.equal(brand.DEFAULT, "#D62828");
   assert.equal(brand.on, "#FFFFFF"); // text-white
   assert.equal(brand.hover, brand.fg); // hover:bg-brand-fg
   assert.equal(brand.text, brand.DEFAULT); // text-brand
-  assert.equal(brand.ring, rojo[300]); // ring-rojo-300 / border-rojo-300
+  assert.equal(brand.ring, rojo[400]); // 0.6.0: foco en rojo-400 (antes rojo-300, 2,75:1)
+  assert.equal(brand.line, rojo[300]); // contorno del Badge «marca», sin cambios
   assert.equal(brand.soft, rojo[50]);
   assert.equal(brand.badge, rojo[700]); // text-rojo-700 del Badge «marca»
   assert.equal(brand.fg, "#AB2020");
@@ -84,7 +86,8 @@ test("preset de Distribución: extiende el base y pisa solo la marca", () => {
   assert.equal(brand.hover, "#E99A06");
   assert.equal(brand.fg, "#865904"); // texto de marca sobre blanco (6,1:1)
   assert.equal(brand.text, "#373A3C");
-  assert.equal(brand.ring, "#FBCA6F");
+  assert.equal(brand.ring, amarillo[700]); // 0.6.0: foco #B37605 (antes #FBCA6F, 1,5:1)
+  assert.equal(brand.line, "#FBCA6F");
   assert.equal(brand.soft, "#FEF7E9");
   assert.equal(amarillo[500], brand.DEFAULT);
   assert.equal(amarillo.DEFAULT, brand.DEFAULT);
@@ -119,6 +122,38 @@ test("contrastes AA de los alias, en las dos marcas", () => {
   assert.ok(contraste("#FFFFFF", coloresDistribucion.brand.DEFAULT) < 3);
 });
 
+// ── 0.6.0: contraste de foco, campos y Badge «verde» (aprobado por Eduardo, 29/10/2026) ──────
+
+test("el foco y el borde de los campos llegan a 3:1 sobre blanco (WCAG 2.2, 1.4.11)", () => {
+  for (const { brand } of [colores, coloresDistribucion]) {
+    assert.ok(contraste(brand.ring, "#FFFFFF") >= 3, `brand-ring ${brand.ring}`);
+  }
+  assert.ok(contraste(colores.rojo[400], "#FFFFFF") >= 3, "foco del botón destructivo");
+  assert.ok(contraste(colores.neutro[500], "#FFFFFF") >= 3, "borde de los campos");
+});
+
+test("Badge «verde»: texto verde-700, AA sobre verde-100 y sobre blanco", () => {
+  assert.equal(colores.verde[700], "#4D6502");
+  assert.ok(contraste(colores.verde[700], colores.verde[100]) >= 4.5);
+  assert.ok(contraste(colores.verde[700], "#FFFFFF") >= 4.5);
+  assert.match(html(h(Badge, { tone: "verde" }, "Pagado")), /bg-verde-100 text-verde-700 border border-verde-300/);
+});
+
+test("los campos del paquete: borde neutro-500 y texto de ayuda neutro-700", () => {
+  // placeholder neutro-700: 4,35:1 sobre blanco (antes neutro-300, 2,45:1)
+  assert.ok(contraste(colores.neutro[700], "#FFFFFF") > 4.3);
+  for (const [archivo, src] of codigo) {
+    assert.doesNotMatch(src, /placeholder:text-neutro-300/, archivo);
+    for (const [cadena] of src.matchAll(/"[^"\n]*\b(?:h-9|h-10|min-h-\[44px\]|flex-1|w-full)\b[^"\n]*rounded-md border border-line[^"\n]*"/g)) {
+      assert.fail(`${archivo}: campo con border-line: ${cadena}`);
+    }
+  }
+  const campo = html(h(Input, { placeholder: "Buscar" }));
+  assert.match(campo, /border-neutro-500/);
+  assert.match(campo, /placeholder:text-neutro-700/);
+  assert.match(campo, /focus:ring-brand-ring/);
+});
+
 // ── Componentes: identidad solo por alias ──────────────────────────────────────────────────
 
 const fuentes = readdirSync(new URL("src/", raiz)).filter((f) => f.endsWith(".tsx"));
@@ -137,16 +172,18 @@ test("ningún componente pone texto blanco sobre bg-brand ni usa text-brand como
 
 test("el rojo queda solo para errores y lo destructivo: el foco es brand-ring", () => {
   for (const [archivo, src] of codigo) {
-    for (const linea of src.split("\n").filter((l) => /rojo-300/.test(l))) {
-      // la única excepción: el botón destructivo, cuyo foco sigue en rojo
-      assert.match(linea, /danger: "bg-rojo-600/, `${archivo}: ${linea.trim()}`);
+    assert.doesNotMatch(src, /rojo-300/, archivo);
+    for (const linea of src.split("\n").filter((l) => /rojo-400/.test(l))) {
+      // la única excepción: el botón destructivo, cuyo foco sigue en rojo (rojo-400 desde la 0.6.0)
+      assert.match(linea, /danger: "bg-rojo-600[^"]*focus-visible:ring-rojo-400"/, `${archivo}: ${linea.trim()}`);
     }
   }
 });
 
 test("Button primario y Badge «marca» salen de los alias", () => {
   assert.match(html(h(Button, null, "Confirmar")), /class="[^"]*bg-brand text-brand-on hover:bg-brand-hover focus-visible:ring-brand-ring/);
-  assert.match(html(h(Badge, { tone: "marca" }, "Nivel Oro")), /bg-white text-brand-badge border border-brand-ring/);
+  // el contorno del Badge «marca» no cambió con el foco de la 0.6.0: va con brand-line
+  assert.match(html(h(Badge, { tone: "marca" }, "Nivel Oro")), /bg-white text-brand-badge border border-brand-line/);
 });
 
 // ── AppHeader: indicador, Apps y nombre ─────────────────────────────────────────────────────
@@ -202,4 +239,25 @@ test("AppHeader mostrarNombre={false}: el logo ya dice el nombre; no se repite",
   assert.doesNotMatch(salida, />Distribución<\/span>/);
   // el separador entre el logo y la navegación sigue
   assert.match(salida, /<span class="hidden h-6 w-px shrink-0 bg-neutro-200 lg:block" aria-hidden="true"><\/span>/);
+});
+
+// ── 0.6.0: Distribución en el menú Apps, solo para quien la tiene habilitada ─────────────────
+
+test("menú Apps: Distribución solo con acceso en el Hub o estando en Distribución", () => {
+  const claves = (lista) => lista.map((m) => m.clave);
+  const distribucion = MODULOS_ENERSOL.find((m) => m.clave === "distribucion");
+  assert.equal(distribucion.url, "https://distribucion.enersol-sa.com");
+  assert.equal(distribucion.soloConAcceso, true);
+  // los de siempre, sin cambios y en el mismo orden
+  const deSiempre = ["plataforma", "operaciones", "propuestas", "marketing", "contabilidad", "financiamiento"];
+  assert.deepEqual(claves(modulosVisibles(MODULOS_ENERSOL, "contabilidad")), deSiempre);
+  assert.deepEqual(claves(modulosVisibles(MODULOS_ENERSOL, "contabilidad", null)), deSiempre);
+  assert.deepEqual(claves(modulosVisibles(MODULOS_ENERSOL, "plataforma", ["operaciones"])), deSiempre);
+  // con el módulo habilitado, aparece al final
+  assert.deepEqual(
+    claves(modulosVisibles(MODULOS_ENERSOL, "plataforma", ["contabilidad", "distribucion"])),
+    [...deSiempre, "distribucion"],
+  );
+  // en Distribución misma se lista como «estás acá»
+  assert.ok(claves(modulosVisibles(MODULOS_ENERSOL, "distribucion")).includes("distribucion"));
 });

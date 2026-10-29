@@ -126,7 +126,7 @@ export function DataTable<T>({
                   const [key, dir] = e.target.value.split(":");
                   setSort(key ? { key, dir: dir as "asc" | "desc" } : null);
                 }}
-                className="min-h-[44px] min-w-0 flex-1 rounded-md border border-line bg-white px-2 text-base text-ink"
+                className="min-h-[44px] min-w-0 flex-1 rounded-md border border-neutro-500 bg-white px-2 text-base text-ink"
               >
                 <option value="">Como vienen</option>
                 {ordenables.map((c) => (
