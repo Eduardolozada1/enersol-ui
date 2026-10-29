@@ -129,24 +129,34 @@ movil, }: {
     movil?: "tarjetas" | "tabla";
 }): react.JSX.Element;
 
-/** Los módulos del ecosistema Enersol (Distribución queda fuera). El orden es el del
- *  lanzador del Hub. Los links pasan por el Hub (`/ir/<clave>`), que emite el ticket de
- *  SSO y redirige: un solo lugar decide quién entra a qué. */
+/** Los módulos del ecosistema Enersol. El orden es el del lanzador del Hub. Los links pasan
+ *  por el Hub (`/ir/<clave>`), que emite el ticket de SSO y redirige: un solo lugar decide quién
+ *  entra a qué. */
 type ModuloEnersol = {
     clave: string;
     nombre: string;
     url: string;
     descripcion: string;
+    /** Solo se lista a quien tiene el módulo habilitado en el Hub (`accesos` del menú) y en el
+     *  propio módulo. Distribución: admin, contabilidad y sus ejecutivos (Eduardo, 29/10/2026). */
+    soloConAcceso?: boolean;
 };
 declare const HUB_URL = "https://app.enersol-sa.com";
 declare const MODULOS_ENERSOL: ModuloEnersol[];
+/** Los módulos que ve esta persona: los de siempre, y los `soloConAcceso` si los tiene
+ *  habilitados (`accesos`, claves del Hub) o si está en ese módulo. Sin `accesos`, ninguno de
+ *  esos: el módulo que no sabe los accesos de la persona no los muestra. */
+declare function modulosVisibles(modulos: ModuloEnersol[], actual: string, accesos?: readonly string[] | null): ModuloEnersol[];
 /** Menú «Apps»: saltar entre módulos sin volver al lanzador. Va junto al logo en el
  *  header de cada módulo. Los destinos pasan por el Hub para el SSO. */
-declare function AppsMenu({ actual, hubUrl, modulos, className, }: {
+declare function AppsMenu({ actual, hubUrl, modulos, accesos, className, }: {
     /** Clave del módulo donde estamos (se marca y no linkea). */
     actual: string;
     hubUrl?: string;
     modulos?: ModuloEnersol[];
+    /** Claves de los módulos que la persona tiene habilitados en el Hub (las del lanzador). Hace
+     *  falta para listar los `soloConAcceso`; sin ella, esos no se muestran. */
+    accesos?: readonly string[] | null;
     className?: string;
 }): react.JSX.Element;
 
@@ -214,7 +224,7 @@ declare function groupAppHeaderItems(items: AppHeaderItem[]): {
  *  (MobileMenu) con TODAS las secciones agrupadas, el usuario y «Salir»: en el celular
  *  nunca hay scroll lateral. Las secciones con `group` van en el desplegable «Más» de la
  *  barra de escritorio. Sin dependencias de router: cada módulo pasa `renderLink`. */
-declare function AppHeader({ moduleKey, moduleName, logo, homeHref, items, currentPath, renderLink, notice, persistentActions, actions, user, onLogout, mobileMenuFooter, desktopFrom, moreLabel, hubUrl, indicador, mostrarApps, mostrarNombre, className, }: {
+declare function AppHeader({ moduleKey, moduleName, logo, homeHref, items, currentPath, renderLink, notice, persistentActions, actions, user, onLogout, mobileMenuFooter, desktopFrom, moreLabel, hubUrl, accesos, indicador, mostrarApps, mostrarNombre, className, }: {
     /** Clave del módulo en el menú Apps (p. ej. "contabilidad"). */
     moduleKey: string;
     moduleName: ReactNode;
@@ -240,6 +250,9 @@ declare function AppHeader({ moduleKey, moduleName, logo, homeHref, items, curre
     desktopFrom?: AppHeaderBreakpoint;
     moreLabel?: ReactNode;
     hubUrl?: string;
+    /** Módulos que la persona tiene habilitados en el Hub (para los del menú Apps que solo ve quien
+     *  tiene acceso, como Distribución). Ver `AppsMenu`. */
+    accesos?: readonly string[] | null;
     /** Cómo se marca la sección actual en la barra de escritorio (por defecto, «texto»). */
     indicador?: AppHeaderIndicador;
     /** Menú Apps (módulos del ecosistema). En falso para quien no es personal de Enersol (los
@@ -640,4 +653,4 @@ declare function GuiaBoton({ variante, className, ocultarEn, open: openProp, onO
     sinBoton?: boolean;
 }): react.JSX.Element | null;
 
-export { AppHeader, type AppHeaderBreakpoint, type AppHeaderIndicador, type AppHeaderItem, type AppHeaderLinkProps, AppsMenu, Badge, type BadgeTone, Button, type ButtonSize, type ButtonVariant, Card, CardBody, CardHeader, CenteredSpinner, CollapsibleCard, type Column, ConfirmDialog, type ConfirmOptions, type ConfirmReason, type ConfirmResult, type ConfirmTone, DOMINIO_ENERSOL, DataTable, EVENTO_ABRIR_MENSAJES, EmptyState, type ErrorPantalla, type Guia, GuiaBoton, GuiaContenido, GuiaPanel, type GuiaPanelProps, HUB_URL, IconoGuia, Input, Logo, type LogoVariant, MODULOS_ENERSOL, type MensajesApi, type MensajesHilo, type MensajesMensaje, type MensajesPersona, MessagesBell, type MessagesBellProps, MobileMenu, MobileMenuSection, Modal, type ModuloEnersol, PageHeader, Pagination, type PaginationRange, type ReporteErrores, type ReporteErroresOpciones, SUGERENCIA_MAX_BYTES, SUGERENCIA_TIPOS_CAPTURA, Select, type SondeoOpciones, Spinner, SugerenciaBoton, type SugerenciaEnviar, SugerenciaModal, type SugerenciaPayload, type SugerenciaTipo, cn, conNegritas, crearReporteErrores, destinoSeguro, groupAppHeaderItems, guiasPorRuta, iniciarSondeo, instalarReporteErrores, isAppHeaderItemActive, mobileMenuItemClass, normalizarRuta, paginationRange, partirNegritas, rutaEmpieza, rutaInterna, rutasMensajes, safeHref, textoContador, useConfirm, useSondeo, validarSugerencia };
+export { AppHeader, type AppHeaderBreakpoint, type AppHeaderIndicador, type AppHeaderItem, type AppHeaderLinkProps, AppsMenu, Badge, type BadgeTone, Button, type ButtonSize, type ButtonVariant, Card, CardBody, CardHeader, CenteredSpinner, CollapsibleCard, type Column, ConfirmDialog, type ConfirmOptions, type ConfirmReason, type ConfirmResult, type ConfirmTone, DOMINIO_ENERSOL, DataTable, EVENTO_ABRIR_MENSAJES, EmptyState, type ErrorPantalla, type Guia, GuiaBoton, GuiaContenido, GuiaPanel, type GuiaPanelProps, HUB_URL, IconoGuia, Input, Logo, type LogoVariant, MODULOS_ENERSOL, type MensajesApi, type MensajesHilo, type MensajesMensaje, type MensajesPersona, MessagesBell, type MessagesBellProps, MobileMenu, MobileMenuSection, Modal, type ModuloEnersol, PageHeader, Pagination, type PaginationRange, type ReporteErrores, type ReporteErroresOpciones, SUGERENCIA_MAX_BYTES, SUGERENCIA_TIPOS_CAPTURA, Select, type SondeoOpciones, Spinner, SugerenciaBoton, type SugerenciaEnviar, SugerenciaModal, type SugerenciaPayload, type SugerenciaTipo, cn, conNegritas, crearReporteErrores, destinoSeguro, groupAppHeaderItems, guiasPorRuta, iniciarSondeo, instalarReporteErrores, isAppHeaderItemActive, mobileMenuItemClass, modulosVisibles, normalizarRuta, paginationRange, partirNegritas, rutaEmpieza, rutaInterna, rutasMensajes, safeHref, textoContador, useConfirm, useSondeo, validarSugerencia };

@@ -10,7 +10,7 @@ import { test } from "node:test";
 import React from "react";
 import ReactDOMServer from "react-dom/server";
 
-import { AppHeader, Badge, Button, Input } from "../dist/index.js";
+import { AppHeader, Badge, Button, Input, MODULOS_ENERSOL, modulosVisibles } from "../dist/index.js";
 
 const require = createRequire(import.meta.url);
 const base = require("../tailwind-preset.cjs");
@@ -239,4 +239,25 @@ test("AppHeader mostrarNombre={false}: el logo ya dice el nombre; no se repite",
   assert.doesNotMatch(salida, />Distribución<\/span>/);
   // el separador entre el logo y la navegación sigue
   assert.match(salida, /<span class="hidden h-6 w-px shrink-0 bg-neutro-200 lg:block" aria-hidden="true"><\/span>/);
+});
+
+// ── 0.6.0: Distribución en el menú Apps, solo para quien la tiene habilitada ─────────────────
+
+test("menú Apps: Distribución solo con acceso en el Hub o estando en Distribución", () => {
+  const claves = (lista) => lista.map((m) => m.clave);
+  const distribucion = MODULOS_ENERSOL.find((m) => m.clave === "distribucion");
+  assert.equal(distribucion.url, "https://distribucion.enersol-sa.com");
+  assert.equal(distribucion.soloConAcceso, true);
+  // los de siempre, sin cambios y en el mismo orden
+  const deSiempre = ["plataforma", "operaciones", "propuestas", "marketing", "contabilidad", "financiamiento"];
+  assert.deepEqual(claves(modulosVisibles(MODULOS_ENERSOL, "contabilidad")), deSiempre);
+  assert.deepEqual(claves(modulosVisibles(MODULOS_ENERSOL, "contabilidad", null)), deSiempre);
+  assert.deepEqual(claves(modulosVisibles(MODULOS_ENERSOL, "plataforma", ["operaciones"])), deSiempre);
+  // con el módulo habilitado, aparece al final
+  assert.deepEqual(
+    claves(modulosVisibles(MODULOS_ENERSOL, "plataforma", ["contabilidad", "distribucion"])),
+    [...deSiempre, "distribucion"],
+  );
+  // en Distribución misma se lista como «estás acá»
+  assert.ok(claves(modulosVisibles(MODULOS_ENERSOL, "distribucion")).includes("distribucion"));
 });

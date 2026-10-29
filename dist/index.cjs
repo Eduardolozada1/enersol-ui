@@ -443,12 +443,23 @@ var MODULOS_ENERSOL = [
   { clave: "propuestas", nombre: "Proyectos", url: "https://propuestas.enersol-sa.com", descripcion: "Cotizador, propuestas y CRM" },
   { clave: "marketing", nombre: "Marketing", url: "https://marketing.enersol-sa.com", descripcion: "Funnel, campa\xF1as y mensajer\xEDa" },
   { clave: "contabilidad", nombre: "Contabilidad", url: "https://contabilidad.enersol-sa.com", descripcion: "Contable, inventario y tesorer\xEDa" },
-  { clave: "financiamiento", nombre: "Cuotas", url: "https://cuotas.enersol-sa.com", descripcion: "Pago en cuotas y cobranza" }
+  { clave: "financiamiento", nombre: "Cuotas", url: "https://cuotas.enersol-sa.com", descripcion: "Pago en cuotas y cobranza" },
+  {
+    clave: "distribucion",
+    nombre: "Distribuci\xF3n",
+    url: "https://distribucion.enersol-sa.com",
+    descripcion: "Portal mayorista para instaladores",
+    soloConAcceso: true
+  }
 ];
+function modulosVisibles(modulos, actual, accesos) {
+  return modulos.filter((m) => !m.soloConAcceso || m.clave === actual || !!accesos?.includes(m.clave));
+}
 function AppsMenu({
   actual,
   hubUrl = HUB_URL,
   modulos = MODULOS_ENERSOL,
+  accesos,
   className
 }) {
   const [abierto, setAbierto] = react.useState(false);
@@ -501,7 +512,7 @@ function AppsMenu({
         className: "absolute left-0 top-full z-30 mt-2 w-72 max-w-[calc(100vw-1.5rem)] rounded-card border border-line bg-surface p-1.5 shadow-card",
         children: [
           /* @__PURE__ */ jsxRuntime.jsx("div", { className: "px-2.5 pb-1.5 pt-1 text-[11px] font-semibold uppercase tracking-wide text-subtle", children: "M\xF3dulos" }),
-          modulos.map((m) => {
+          modulosVisibles(modulos, actual, accesos).map((m) => {
             const esActual = m.clave === actual;
             const href = m.clave === "plataforma" ? hubUrl : `${hubUrl}/ir/${m.clave}`;
             return /* @__PURE__ */ jsxRuntime.jsxs(
@@ -715,6 +726,7 @@ function AppHeader({
   desktopFrom = "lg",
   moreLabel = "M\xE1s",
   hubUrl = HUB_URL,
+  accesos,
   indicador = "texto",
   mostrarApps = true,
   mostrarNombre = true,
@@ -735,7 +747,7 @@ function AppHeader({
     notice && /* @__PURE__ */ jsxRuntime.jsx("div", { role: "status", className: "border-b border-ambar-300 bg-ambar-100 px-4 py-2 text-center text-[13px] font-medium text-ambar-700", children: notice }),
     /* @__PURE__ */ jsxRuntime.jsxs("div", { className: cn("flex h-16 items-center justify-between gap-2 px-3", bp.gap, bp.px), children: [
       /* @__PURE__ */ jsxRuntime.jsxs("div", { className: cn("flex min-w-0 items-center gap-2", bp.gap, indicador === "subrayado" && "self-stretch"), children: [
-        mostrarApps && /* @__PURE__ */ jsxRuntime.jsx(AppsMenu, { actual: moduleKey, hubUrl, className: "-ml-1.5 shrink-0" }),
+        mostrarApps && /* @__PURE__ */ jsxRuntime.jsx(AppsMenu, { actual: moduleKey, hubUrl, accesos, className: "-ml-1.5 shrink-0" }),
         renderLink({ href: homeHref, className: "shrink-0", children: logo }),
         mostrarNombre && /* @__PURE__ */ jsxRuntime.jsx("span", { className: cn("min-w-0 truncate font-display text-[15px] font-semibold text-neutro-900", bp.oculto), children: moduleName }),
         /* @__PURE__ */ jsxRuntime.jsx("span", { className: cn("hidden h-6 w-px shrink-0 bg-neutro-200", bp.block), "aria-hidden": true }),
@@ -2147,6 +2159,7 @@ exports.iniciarSondeo = iniciarSondeo;
 exports.instalarReporteErrores = instalarReporteErrores;
 exports.isAppHeaderItemActive = isAppHeaderItemActive;
 exports.mobileMenuItemClass = mobileMenuItemClass;
+exports.modulosVisibles = modulosVisibles;
 exports.normalizarRuta = normalizarRuta;
 exports.paginationRange = paginationRange;
 exports.partirNegritas = partirNegritas;

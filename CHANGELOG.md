@@ -21,7 +21,12 @@ contra la 0.5.0 marca solo eso: 42 de 46 capturas distintas, porque hay campos e
 - **Alias nuevo `brand-line`**: el contorno del Badge «marca», con el valor de antes
   (`#E67E7E`; `#FBCA6F` en Distribución), así esa pastilla no cambia. `brand-ring` queda solo
   para el foco: un módulo que lo use como borde decorativo pasa a `brand-line`.
-- `npm test`: 3 pruebas nuevas de contraste (53 en total).
+- **Menú Apps con Distribución** (Eduardo, 29/10/2026: la ven admin, contabilidad y los ejecutivos
+  de Distribución). Entra en `MODULOS_ENERSOL` con `soloConAcceso`: se lista solo si la persona la
+  tiene habilitada en el Hub (prop nueva `accesos` de `AppsMenu` y `AppHeader`, las claves del
+  lanzador) o si está en Distribución. Un módulo que no pasa `accesos` no la muestra: nada cambia
+  en los módulos hasta que la pasen. `modulosVisibles()` hace el filtro.
+- `npm test`: 4 pruebas nuevas (54 en total).
 
 ## 0.5.0 — 29/10/2026
 

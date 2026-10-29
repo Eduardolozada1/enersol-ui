@@ -273,6 +273,9 @@ versión. Detalle en el CHANGELOG.
 - Badge «verde» con `text-verde-700` (token nuevo `#4D6502`).
 - `brand-line`: contorno del Badge «marca» (el color de antes del foco). `brand-ring` es solo
   para el foco.
+- Menú Apps: Distribución, solo para quien la tiene habilitada en el Hub. El módulo pasa las
+  claves del lanzador de la persona: `<AppHeader accesos={["contabilidad", "distribucion"]} … />`
+  (o `<AppsMenu accesos={…} />`); sin `accesos`, Distribución no aparece.
 
 ## 0.5.0 — Alias de marca y Enersol Distribución (29/10/2026)
 

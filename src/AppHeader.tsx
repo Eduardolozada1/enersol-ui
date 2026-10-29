@@ -182,6 +182,7 @@ export function AppHeader({
   desktopFrom = "lg",
   moreLabel = "Más",
   hubUrl = HUB_URL,
+  accesos,
   indicador = "texto",
   mostrarApps = true,
   mostrarNombre = true,
@@ -209,6 +210,9 @@ export function AppHeader({
   desktopFrom?: AppHeaderBreakpoint;
   moreLabel?: ReactNode;
   hubUrl?: string;
+  /** Módulos que la persona tiene habilitados en el Hub (para los del menú Apps que solo ve quien
+   *  tiene acceso, como Distribución). Ver `AppsMenu`. */
+  accesos?: readonly string[] | null;
   /** Cómo se marca la sección actual en la barra de escritorio (por defecto, «texto»). */
   indicador?: AppHeaderIndicador;
   /** Menú Apps (módulos del ecosistema). En falso para quien no es personal de Enersol (los
@@ -247,7 +251,7 @@ export function AppHeader({
         {/* con «subrayado» la fila del logo y la barra ocupa todo el alto (h-16): así la barra de la
             sección actual queda pegada al borde inferior del encabezado y no debajo del texto */}
         <div className={cn("flex min-w-0 items-center gap-2", bp.gap, indicador === "subrayado" && "self-stretch")}>
-          {mostrarApps && <AppsMenu actual={moduleKey} hubUrl={hubUrl} className="-ml-1.5 shrink-0" />}
+          {mostrarApps && <AppsMenu actual={moduleKey} hubUrl={hubUrl} accesos={accesos} className="-ml-1.5 shrink-0" />}
           {renderLink({ href: homeHref, className: "shrink-0", children: logo })}
           {mostrarNombre && (
             <span className={cn("min-w-0 truncate font-display text-[15px] font-semibold text-neutro-900", bp.oculto)}>
