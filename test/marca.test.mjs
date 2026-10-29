@@ -181,6 +181,8 @@ test("AppHeader por defecto: igual que antes (Apps, nombre y la actual en texto)
 test("AppHeader indicador=\"subrayado\": barra amarilla de 3 px pegada al borde inferior", () => {
   const salida = encabezado({ indicador: "subrayado" });
   assert.match(salida, /<nav aria-label="Secciones del módulo" class="[^"]*self-stretch/);
+  // la fila que contiene la barra también ocupa todo el alto (si no, la barra flota sobre el borde)
+  assert.match(salida, /<div class="flex min-w-0 items-center gap-2 lg:gap-4 self-stretch">/);
   const actual = salida.match(/<a href="\/pedidos" aria-current="page" class="([^"]*)"/)[1];
   assert.match(actual, /text-brand-text/);
   assert.match(actual, /h-full/);

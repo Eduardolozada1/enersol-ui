@@ -732,7 +732,7 @@ function AppHeader({
   return /* @__PURE__ */ jsxs("header", { className: cn("sticky top-0 z-30 border-b border-neutro-200 bg-white", className), children: [
     notice && /* @__PURE__ */ jsx("div", { role: "status", className: "border-b border-ambar-300 bg-ambar-100 px-4 py-2 text-center text-[13px] font-medium text-ambar-700", children: notice }),
     /* @__PURE__ */ jsxs("div", { className: cn("flex h-16 items-center justify-between gap-2 px-3", bp.gap, bp.px), children: [
-      /* @__PURE__ */ jsxs("div", { className: cn("flex min-w-0 items-center gap-2", bp.gap), children: [
+      /* @__PURE__ */ jsxs("div", { className: cn("flex min-w-0 items-center gap-2", bp.gap, indicador === "subrayado" && "self-stretch"), children: [
         mostrarApps && /* @__PURE__ */ jsx(AppsMenu, { actual: moduleKey, hubUrl, className: "-ml-1.5 shrink-0" }),
         renderLink({ href: homeHref, className: "shrink-0", children: logo }),
         mostrarNombre && /* @__PURE__ */ jsx("span", { className: cn("min-w-0 truncate font-display text-[15px] font-semibold text-neutro-900", bp.oculto), children: moduleName }),
