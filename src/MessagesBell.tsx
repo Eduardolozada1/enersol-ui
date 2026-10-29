@@ -243,7 +243,7 @@ export function MessagesBell({
           <IconoSobre />
           <span className="flex-1">Mensajes</span>
           {contador && (
-            <span className="grid h-6 min-w-[24px] place-items-center rounded-pill bg-brand px-1.5 text-[12px] font-bold text-white" aria-label={`${contador} sin leer`}>
+            <span className="grid h-6 min-w-[24px] place-items-center rounded-pill bg-brand px-1.5 text-[12px] font-bold text-brand-on" aria-label={`${contador} sin leer`}>
               {contador}
             </span>
           )}
@@ -263,7 +263,7 @@ export function MessagesBell({
           {contador && (
             <span
               aria-hidden
-              className="absolute -right-0.5 -top-0.5 grid h-[18px] min-w-[18px] animate-bounce place-items-center rounded-pill bg-brand px-1 text-[10px] font-bold text-white motion-reduce:animate-none"
+              className="absolute -right-0.5 -top-0.5 grid h-[18px] min-w-[18px] animate-bounce place-items-center rounded-pill bg-brand px-1 text-[10px] font-bold text-brand-on motion-reduce:animate-none"
             >
               {contador}
             </span>
@@ -325,7 +325,7 @@ export function MessagesBell({
                     >
                       {t === "mensajes" ? "Mensajes" : "Menciones"}
                       {t === "menciones" && mencionesSinLeer > 0 && (
-                        <span className="ml-1 text-[11px] font-bold text-brand">{mencionesSinLeer}</span>
+                        <span className="ml-1 text-[11px] font-bold text-brand-text">{mencionesSinLeer}</span>
                       )}
                     </button>
                   ))}
@@ -371,7 +371,7 @@ export function MessagesBell({
                           <span className="block truncate text-[12px] text-subtle sm:text-[11px]">{t.ultimo_cuerpo}</span>
                         </span>
                         {t.no_leidos > 0 && (
-                          <span className="mt-1 grid h-4 min-w-[16px] shrink-0 place-items-center rounded-pill bg-brand px-1 text-[10px] font-bold text-white">
+                          <span className="mt-1 grid h-4 min-w-[16px] shrink-0 place-items-center rounded-pill bg-brand px-1 text-[10px] font-bold text-brand-on">
                             {t.no_leidos}
                           </span>
                         )}
@@ -456,7 +456,7 @@ function NuevoMensaje({
           onChange={(e) => setQ(e.target.value)}
           placeholder="¿A quién le escribís?"
           aria-label="¿A quién le escribís?"
-          className="min-w-0 flex-1 rounded-md border border-line px-2 py-1.5 text-[16px] text-ink focus:outline-none focus:ring-2 focus:ring-rojo-300 sm:text-caption"
+          className="min-w-0 flex-1 rounded-md border border-line px-2 py-1.5 text-[16px] text-ink focus:outline-none focus:ring-2 focus:ring-brand-ring sm:text-caption"
         />
         <button
           type="button"
@@ -554,9 +554,9 @@ function ChatView({
           const mio = m.de_email === selfEmail;
           return (
             <div key={m.id} className={cn("flex", mio ? "justify-end" : "justify-start")}>
-              <div className={cn("max-w-[80%] whitespace-pre-line break-words rounded-card px-3 py-2 text-caption", mio ? "bg-brand text-white" : "bg-neutro-100 text-ink")}>
+              <div className={cn("max-w-[80%] whitespace-pre-line break-words rounded-card px-3 py-2 text-caption", mio ? "bg-brand text-brand-on" : "bg-neutro-100 text-ink")}>
                 {m.cuerpo}
-                <div className={cn("mt-0.5 text-[11px] sm:text-[9px]", mio ? "text-white/70" : "text-subtle")}>{fecha(m.created_at)}</div>
+                <div className={cn("mt-0.5 text-[11px] sm:text-[9px]", mio ? "text-brand-on/70" : "text-subtle")}>{fecha(m.created_at)}</div>
               </div>
             </div>
           );
@@ -580,13 +580,13 @@ function ChatView({
           }}
           placeholder="Escribí un mensaje…"
           aria-label="Escribí un mensaje"
-          className="min-w-0 flex-1 rounded-md border border-line px-3 py-2 text-[16px] text-ink focus:outline-none focus:ring-2 focus:ring-rojo-300 sm:text-caption"
+          className="min-w-0 flex-1 rounded-md border border-line px-3 py-2 text-[16px] text-ink focus:outline-none focus:ring-2 focus:ring-brand-ring sm:text-caption"
         />
         <button
           type="button"
           onClick={enviar}
           disabled={enviando || !texto.trim()}
-          className="rounded-md bg-brand px-4 text-caption font-medium text-white hover:bg-brand-fg disabled:opacity-50 [@media(pointer:coarse)]:min-h-[44px]"
+          className="rounded-md bg-brand px-4 text-caption font-medium text-brand-on hover:bg-brand-hover disabled:opacity-50 [@media(pointer:coarse)]:min-h-[44px]"
         >
           Enviar
         </button>

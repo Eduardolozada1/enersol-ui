@@ -57,8 +57,21 @@ module.exports = {
         },
         // Amarillo Enersol (escenario "gas" en Proyectos)
         amarillo: { DEFAULT: "#FFC02E" },
-        // Alias semánticos (lo que se usa en la UI)
-        brand: { DEFAULT: "#D62828", fg: "#AB2020", strong: "#801818" },
+        // Alias semánticos (lo que se usa en la UI). Los componentes del paquete usan SOLO estos
+        // alias para la identidad: una división con otra marca pisa los alias en su preset
+        // (tailwind-preset-distribucion.cjs) y los componentes la toman sin cambiar. Los valores de
+        // acá reproducen exactamente las clases de antes de la 0.5.0 (nada cambia en los módulos).
+        brand: {
+          DEFAULT: "#D62828", // relleno de identidad (botón principal, contadores)
+          on: "#FFFFFF", // texto o ícono SOBRE bg-brand
+          hover: "#AB2020", // hover del relleno
+          fg: "#AB2020", // texto de marca sobre blanco (enlaces)
+          text: "#D62828", // ítem activo del encabezado, del menú y de la paginación
+          ring: "#E67E7E", // anillo y borde de foco (= rojo-300)
+          soft: "#FBEAEA", // fondo suave de marca (= rojo-50)
+          badge: "#801818", // texto del Badge «marca» (= rojo-700)
+          strong: "#801818",
+        },
         ink: "#494C4A", // texto principal
         subtle: "#5F6260", // texto secundario (6.2:1 sobre blanco · WCAG AA)
         line: "#DDDBDD", // bordes / divisores (visibles, no fantasmas)

@@ -9,7 +9,7 @@ function cn(...parts) {
 }
 var BUTTON_VARIANTS = {
   // Rojo manda pero no satura: primario sólido, el resto sobrio. UN primario por pantalla.
-  primary: "bg-brand text-white hover:bg-brand-fg focus-visible:ring-rojo-300",
+  primary: "bg-brand text-brand-on hover:bg-brand-hover focus-visible:ring-brand-ring",
   secondary: "bg-white text-ink border border-line hover:bg-neutro-50 focus-visible:ring-neutro-200",
   ghost: "bg-transparent text-ink hover:bg-neutro-100 focus-visible:ring-neutro-200",
   danger: "bg-rojo-600 text-white hover:bg-rojo-700 focus-visible:ring-rojo-300"
@@ -55,7 +55,7 @@ var BADGE_TONES = {
   rojo: "bg-rojo-600 text-white",
   verde: "bg-verde-100 text-verde-600 border border-verde-300",
   atencion: "bg-ambar-100 text-ambar-700 border border-ambar-300",
-  marca: "bg-white text-rojo-700 border border-rojo-300"
+  marca: "bg-white text-brand-badge border border-brand-ring"
 };
 function Badge({
   tone = "neutro",
@@ -82,7 +82,7 @@ function Input({ className, ...props }) {
         "h-10 w-full rounded-md border border-line bg-white px-3 text-body text-ink",
         TACTIL,
         "placeholder:text-neutro-300",
-        "focus:outline-none focus:ring-2 focus:ring-rojo-300 focus:border-rojo-300",
+        "focus:outline-none focus:ring-2 focus:ring-brand-ring focus:border-brand-ring",
         className
       ),
       ...props
@@ -96,7 +96,7 @@ function Select({ className, ...props }) {
       className: cn(
         "h-9 rounded-md border border-line bg-white px-3 text-base sm:text-caption text-ink",
         TACTIL,
-        "focus:outline-none focus:ring-2 focus:ring-rojo-300",
+        "focus:outline-none focus:ring-2 focus:ring-brand-ring",
         className
       ),
       ...props
@@ -423,7 +423,7 @@ function DataTable({
                 tabIndex: onRowClick ? 0 : void 0,
                 className: cn(
                   "border-b border-line last:border-0",
-                  onRowClick && "cursor-pointer hover:bg-neutro-50 focus:outline-none focus-visible:bg-neutro-50 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-rojo-300",
+                  onRowClick && "cursor-pointer hover:bg-neutro-50 focus:outline-none focus-visible:bg-neutro-50 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-ring",
                   rowClassName?.(row)
                 ),
                 children: columns.map((c) => /* @__PURE__ */ jsxRuntime.jsx("td", { className: cn(pad, alignCls(c.align), c.hideBelow && HIDE[c.hideBelow], c.className), children: c.render(row) }, c.key))
@@ -516,7 +516,7 @@ function AppsMenu({
                   esActual ? "bg-neutro-100 cursor-default" : "hover:bg-neutro-50"
                 ),
                 children: [
-                  /* @__PURE__ */ jsxRuntime.jsxs("div", { className: cn("text-caption font-medium", esActual ? "text-brand" : "text-ink"), children: [
+                  /* @__PURE__ */ jsxRuntime.jsxs("div", { className: cn("text-caption font-medium", esActual ? "text-brand-text" : "text-ink"), children: [
                     m.nombre,
                     esActual && /* @__PURE__ */ jsxRuntime.jsx("span", { className: "ml-2 text-[11px] font-normal text-subtle", children: "est\xE1s ac\xE1" })
                   ] }),
@@ -599,7 +599,7 @@ function MobileMenu({
 function mobileMenuItemClass(activo = false) {
   return cn(
     "flex min-h-[48px] w-full items-center gap-3 rounded-md px-3 text-left text-[16px] font-medium transition-colors",
-    activo ? "bg-neutro-100 text-brand" : "text-ink hover:bg-neutro-50"
+    activo ? "bg-neutro-100 text-brand-text" : "text-ink hover:bg-neutro-50"
   );
 }
 function MobileMenuSection({ children }) {
@@ -626,15 +626,19 @@ function groupAppHeaderItems(items) {
   return { main, groups: [...grupos.entries()] };
 }
 var enlacePorDefecto = ({ href, ...props }) => /* @__PURE__ */ jsxRuntime.jsx("a", { href, ...props });
-var claseBarra = (activo) => cn(
+var claseBarra = (activo, indicador = "texto") => cn(
   "whitespace-nowrap px-2 py-2 text-[13px] font-medium transition-colors",
-  activo ? "text-brand" : "text-subtle hover:text-brand"
+  activo ? "text-brand-text" : "text-subtle hover:text-brand-text",
+  // la barra va por ::after, pegada al borde de abajo del encabezado (tapa su línea de 1 px)
+  indicador === "subrayado" && "relative inline-flex h-full items-center",
+  indicador === "subrayado" && activo && "after:absolute after:inset-x-2 after:-bottom-px after:h-[3px] after:rounded-t-sm after:bg-brand after:content-['']"
 );
 function MasSecciones({
   label,
   groups,
   path,
-  renderLink
+  renderLink,
+  indicador
 }) {
   const [abierto, setAbierto] = react.useState(false);
   const ref = react.useRef(null);
@@ -653,7 +657,7 @@ function MasSecciones({
     };
   }, [abierto]);
   react.useEffect(() => setAbierto(false), [path]);
-  return /* @__PURE__ */ jsxRuntime.jsxs("div", { ref, className: "relative", children: [
+  return /* @__PURE__ */ jsxRuntime.jsxs("div", { ref, className: cn("relative", indicador === "subrayado" && "flex h-full"), children: [
     /* @__PURE__ */ jsxRuntime.jsxs(
       "button",
       {
@@ -661,7 +665,7 @@ function MasSecciones({
         onClick: () => setAbierto((v) => !v),
         "aria-haspopup": "menu",
         "aria-expanded": abierto,
-        className: cn(claseBarra(activo), "inline-flex items-center gap-1"),
+        className: cn(claseBarra(activo, indicador), "inline-flex items-center gap-1"),
         children: [
           label,
           /* @__PURE__ */ jsxRuntime.jsx("svg", { viewBox: "0 0 20 20", className: cn("h-3.5 w-3.5 transition-transform", abierto && "rotate-180"), fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", "aria-hidden": true, children: /* @__PURE__ */ jsxRuntime.jsx("path", { d: "M5 8l5 5 5-5" }) })
@@ -684,7 +688,7 @@ function MasSecciones({
               onClick: () => setAbierto(false),
               className: cn(
                 "block whitespace-nowrap rounded-md px-2 py-1.5 text-[13px] font-medium transition-colors",
-                actual ? "bg-neutro-100 text-brand" : "text-ink hover:bg-neutro-50 hover:text-brand"
+                actual ? "bg-neutro-100 text-brand-text" : "text-ink hover:bg-neutro-50 hover:text-brand-text"
               ),
               children: item.label
             }) }, item.href);
@@ -711,6 +715,9 @@ function AppHeader({
   desktopFrom = "lg",
   moreLabel = "M\xE1s",
   hubUrl = HUB_URL,
+  indicador = "texto",
+  mostrarApps = true,
+  mostrarNombre = true,
   className
 }) {
   const bp = DESDE[desktopFrom];
@@ -728,30 +735,37 @@ function AppHeader({
     notice && /* @__PURE__ */ jsxRuntime.jsx("div", { role: "status", className: "border-b border-ambar-300 bg-ambar-100 px-4 py-2 text-center text-[13px] font-medium text-ambar-700", children: notice }),
     /* @__PURE__ */ jsxRuntime.jsxs("div", { className: cn("flex h-16 items-center justify-between gap-2 px-3", bp.gap, bp.px), children: [
       /* @__PURE__ */ jsxRuntime.jsxs("div", { className: cn("flex min-w-0 items-center gap-2", bp.gap), children: [
-        /* @__PURE__ */ jsxRuntime.jsx(AppsMenu, { actual: moduleKey, hubUrl, className: "-ml-1.5 shrink-0" }),
+        mostrarApps && /* @__PURE__ */ jsxRuntime.jsx(AppsMenu, { actual: moduleKey, hubUrl, className: "-ml-1.5 shrink-0" }),
         renderLink({ href: homeHref, className: "shrink-0", children: logo }),
-        /* @__PURE__ */ jsxRuntime.jsx("span", { className: cn("min-w-0 truncate font-display text-[15px] font-semibold text-neutro-900", bp.oculto), children: moduleName }),
+        mostrarNombre && /* @__PURE__ */ jsxRuntime.jsx("span", { className: cn("min-w-0 truncate font-display text-[15px] font-semibold text-neutro-900", bp.oculto), children: moduleName }),
         /* @__PURE__ */ jsxRuntime.jsx("span", { className: cn("hidden h-6 w-px shrink-0 bg-neutro-200", bp.block), "aria-hidden": true }),
-        /* @__PURE__ */ jsxRuntime.jsx("span", { className: cn("hidden shrink-0 whitespace-nowrap font-display text-[17px] font-semibold text-neutro-900", bp.block), children: moduleName }),
-        /* @__PURE__ */ jsxRuntime.jsxs("nav", { "aria-label": "Secciones del m\xF3dulo", className: cn("hidden shrink-0 items-center gap-1", bp.flex), children: [
-          main.map((item) => {
-            const actual = isAppHeaderItemActive(item, currentPath);
-            return /* @__PURE__ */ jsxRuntime.jsx(react.Fragment, { children: renderLink({
-              href: item.href,
-              "aria-current": actual ? "page" : void 0,
-              className: claseBarra(actual),
-              children: item.label
-            }) }, item.href);
-          }),
-          groups.length > 0 && /* @__PURE__ */ jsxRuntime.jsx(MasSecciones, { label: moreLabel, groups, path: currentPath, renderLink })
-        ] })
+        mostrarNombre && /* @__PURE__ */ jsxRuntime.jsx("span", { className: cn("hidden shrink-0 whitespace-nowrap font-display text-[17px] font-semibold text-neutro-900", bp.block), children: moduleName }),
+        /* @__PURE__ */ jsxRuntime.jsxs(
+          "nav",
+          {
+            "aria-label": "Secciones del m\xF3dulo",
+            className: cn("hidden shrink-0 items-center gap-1", bp.flex, indicador === "subrayado" && "self-stretch"),
+            children: [
+              main.map((item) => {
+                const actual = isAppHeaderItemActive(item, currentPath);
+                return /* @__PURE__ */ jsxRuntime.jsx(react.Fragment, { children: renderLink({
+                  href: item.href,
+                  "aria-current": actual ? "page" : void 0,
+                  className: claseBarra(actual, indicador),
+                  children: item.label
+                }) }, item.href);
+              }),
+              groups.length > 0 && /* @__PURE__ */ jsxRuntime.jsx(MasSecciones, { label: moreLabel, groups, path: currentPath, renderLink, indicador })
+            ]
+          }
+        )
       ] }),
       /* @__PURE__ */ jsxRuntime.jsxs("div", { className: cn("flex shrink-0 items-center gap-1", bp.gapAcciones), children: [
         persistentActions,
         /* @__PURE__ */ jsxRuntime.jsxs("span", { className: cn("hidden", bp.contents), children: [
           actions,
           user && /* @__PURE__ */ jsxRuntime.jsx("span", { className: "hidden whitespace-nowrap text-[13px] text-neutro-900 2xl:block", title: user.email, children: user.name }),
-          onLogout && /* @__PURE__ */ jsxRuntime.jsx("button", { type: "button", onClick: onLogout, className: "px-2 py-1 text-[13px] text-subtle transition-colors hover:text-brand", children: "Salir" })
+          onLogout && /* @__PURE__ */ jsxRuntime.jsx("button", { type: "button", onClick: onLogout, className: "px-2 py-1 text-[13px] text-subtle transition-colors hover:text-brand-text", children: "Salir" })
         ] }),
         /* @__PURE__ */ jsxRuntime.jsxs(
           MobileMenu,
@@ -900,7 +914,7 @@ function ConfirmDialog({
                     rows: 3,
                     placeholder: reason.placeholder,
                     disabled: ocupado,
-                    className: "w-full rounded-md border border-line bg-white px-3 py-2 text-body text-ink placeholder:text-neutro-300 focus:border-rojo-300 focus:outline-none focus:ring-2 focus:ring-rojo-300"
+                    className: "w-full rounded-md border border-line bg-white px-3 py-2 text-body text-ink placeholder:text-neutro-300 focus:border-brand-ring focus:outline-none focus:ring-2 focus:ring-brand-ring"
                   }
                 )
               ] }),
@@ -1028,7 +1042,7 @@ function Pagination({
                   "tnum h-8 min-w-[2rem] rounded-md px-2 text-caption font-medium transition-colors",
                   "[@media(pointer:coarse)]:min-h-[44px] [@media(pointer:coarse)]:min-w-[44px]",
                   "disabled:pointer-events-none disabled:opacity-50",
-                  p === r.page ? "bg-neutro-100 text-brand" : "text-ink hover:bg-neutro-50"
+                  p === r.page ? "bg-neutro-100 text-brand-text" : "text-ink hover:bg-neutro-50"
                 ),
                 children: miles(p)
               },
@@ -1393,7 +1407,7 @@ function MessagesBell({
     enMenu ? /* @__PURE__ */ jsxRuntime.jsxs("button", { ref: botonRef, type: "button", onClick: alternar, "aria-haspopup": "dialog", "aria-expanded": open, className: mobileMenuItemClass(), children: [
       /* @__PURE__ */ jsxRuntime.jsx(IconoSobre, {}),
       /* @__PURE__ */ jsxRuntime.jsx("span", { className: "flex-1", children: "Mensajes" }),
-      contador && /* @__PURE__ */ jsxRuntime.jsx("span", { className: "grid h-6 min-w-[24px] place-items-center rounded-pill bg-brand px-1.5 text-[12px] font-bold text-white", "aria-label": `${contador} sin leer`, children: contador })
+      contador && /* @__PURE__ */ jsxRuntime.jsx("span", { className: "grid h-6 min-w-[24px] place-items-center rounded-pill bg-brand px-1.5 text-[12px] font-bold text-brand-on", "aria-label": `${contador} sin leer`, children: contador })
     ] }) : /* @__PURE__ */ jsxRuntime.jsxs(
       "button",
       {
@@ -1411,7 +1425,7 @@ function MessagesBell({
             "span",
             {
               "aria-hidden": true,
-              className: "absolute -right-0.5 -top-0.5 grid h-[18px] min-w-[18px] animate-bounce place-items-center rounded-pill bg-brand px-1 text-[10px] font-bold text-white motion-reduce:animate-none",
+              className: "absolute -right-0.5 -top-0.5 grid h-[18px] min-w-[18px] animate-bounce place-items-center rounded-pill bg-brand px-1 text-[10px] font-bold text-brand-on motion-reduce:animate-none",
               children: contador
             }
           )
@@ -1473,7 +1487,7 @@ function MessagesBell({
                   ),
                   children: [
                     t === "mensajes" ? "Mensajes" : "Menciones",
-                    t === "menciones" && mencionesSinLeer > 0 && /* @__PURE__ */ jsxRuntime.jsx("span", { className: "ml-1 text-[11px] font-bold text-brand", children: mencionesSinLeer })
+                    t === "menciones" && mencionesSinLeer > 0 && /* @__PURE__ */ jsxRuntime.jsx("span", { className: "ml-1 text-[11px] font-bold text-brand-text", children: mencionesSinLeer })
                   ]
                 },
                 t
@@ -1516,7 +1530,7 @@ function MessagesBell({
                       ] }),
                       /* @__PURE__ */ jsxRuntime.jsx("span", { className: "block truncate text-[12px] text-subtle sm:text-[11px]", children: t.ultimo_cuerpo })
                     ] }),
-                    t.no_leidos > 0 && /* @__PURE__ */ jsxRuntime.jsx("span", { className: "mt-1 grid h-4 min-w-[16px] shrink-0 place-items-center rounded-pill bg-brand px-1 text-[10px] font-bold text-white", children: t.no_leidos })
+                    t.no_leidos > 0 && /* @__PURE__ */ jsxRuntime.jsx("span", { className: "mt-1 grid h-4 min-w-[16px] shrink-0 place-items-center rounded-pill bg-brand px-1 text-[10px] font-bold text-brand-on", children: t.no_leidos })
                   ]
                 },
                 t.con_email
@@ -1580,7 +1594,7 @@ function NuevoMensaje({
           onChange: (e) => setQ(e.target.value),
           placeholder: "\xBFA qui\xE9n le escrib\xEDs?",
           "aria-label": "\xBFA qui\xE9n le escrib\xEDs?",
-          className: "min-w-0 flex-1 rounded-md border border-line px-2 py-1.5 text-[16px] text-ink focus:outline-none focus:ring-2 focus:ring-rojo-300 sm:text-caption"
+          className: "min-w-0 flex-1 rounded-md border border-line px-2 py-1.5 text-[16px] text-ink focus:outline-none focus:ring-2 focus:ring-brand-ring sm:text-caption"
         }
       ),
       /* @__PURE__ */ jsxRuntime.jsx(
@@ -1669,9 +1683,9 @@ function ChatView({
     /* @__PURE__ */ jsxRuntime.jsxs("div", { className: "flex-1 space-y-2 overflow-y-auto p-3", "aria-live": "polite", children: [
       msgs.map((m) => {
         const mio = m.de_email === selfEmail;
-        return /* @__PURE__ */ jsxRuntime.jsx("div", { className: cn("flex", mio ? "justify-end" : "justify-start"), children: /* @__PURE__ */ jsxRuntime.jsxs("div", { className: cn("max-w-[80%] whitespace-pre-line break-words rounded-card px-3 py-2 text-caption", mio ? "bg-brand text-white" : "bg-neutro-100 text-ink"), children: [
+        return /* @__PURE__ */ jsxRuntime.jsx("div", { className: cn("flex", mio ? "justify-end" : "justify-start"), children: /* @__PURE__ */ jsxRuntime.jsxs("div", { className: cn("max-w-[80%] whitespace-pre-line break-words rounded-card px-3 py-2 text-caption", mio ? "bg-brand text-brand-on" : "bg-neutro-100 text-ink"), children: [
           m.cuerpo,
-          /* @__PURE__ */ jsxRuntime.jsx("div", { className: cn("mt-0.5 text-[11px] sm:text-[9px]", mio ? "text-white/70" : "text-subtle"), children: fecha(m.created_at) })
+          /* @__PURE__ */ jsxRuntime.jsx("div", { className: cn("mt-0.5 text-[11px] sm:text-[9px]", mio ? "text-brand-on/70" : "text-subtle"), children: fecha(m.created_at) })
         ] }) }, m.id);
       }),
       /* @__PURE__ */ jsxRuntime.jsx("div", { ref: endRef })
@@ -1691,7 +1705,7 @@ function ChatView({
           },
           placeholder: "Escrib\xED un mensaje\u2026",
           "aria-label": "Escrib\xED un mensaje",
-          className: "min-w-0 flex-1 rounded-md border border-line px-3 py-2 text-[16px] text-ink focus:outline-none focus:ring-2 focus:ring-rojo-300 sm:text-caption"
+          className: "min-w-0 flex-1 rounded-md border border-line px-3 py-2 text-[16px] text-ink focus:outline-none focus:ring-2 focus:ring-brand-ring sm:text-caption"
         }
       ),
       /* @__PURE__ */ jsxRuntime.jsx(
@@ -1700,7 +1714,7 @@ function ChatView({
           type: "button",
           onClick: enviar,
           disabled: enviando || !texto.trim(),
-          className: "rounded-md bg-brand px-4 text-caption font-medium text-white hover:bg-brand-fg disabled:opacity-50 [@media(pointer:coarse)]:min-h-[44px]",
+          className: "rounded-md bg-brand px-4 text-caption font-medium text-brand-on hover:bg-brand-hover disabled:opacity-50 [@media(pointer:coarse)]:min-h-[44px]",
           children: "Enviar"
         }
       )
@@ -1841,7 +1855,7 @@ function SugerenciaModal({
         onClick: () => setTipo(t),
         className: cn(
           "rounded-pill border px-3 py-1.5 text-[13px] [@media(pointer:coarse)]:min-h-[44px]",
-          tipo === t ? "border-brand bg-brand text-white" : "border-line bg-white text-ink hover:bg-neutro-50"
+          tipo === t ? "border-brand bg-brand text-brand-on" : "border-line bg-white text-ink hover:bg-neutro-50"
         ),
         children: t === "mejora" ? "\u{1F4A1} Mejora" : "\u{1F41E} Error"
       },
@@ -1857,7 +1871,7 @@ function SugerenciaModal({
           onChange: (e) => setDescripcion(e.target.value),
           rows: 5,
           placeholder: tipo === "error" ? "Qu\xE9 hiciste, qu\xE9 esperabas y qu\xE9 pas\xF3\u2026" : "Qu\xE9 te gustar\xEDa que haga o cambie\u2026",
-          className: "w-full rounded-md border border-line px-3 py-2 text-[16px] text-ink placeholder:text-neutro-300 focus:outline-none focus:ring-2 focus:ring-rojo-300 sm:text-[14px]"
+          className: "w-full rounded-md border border-line px-3 py-2 text-[16px] text-ink placeholder:text-neutro-300 focus:outline-none focus:ring-2 focus:ring-brand-ring sm:text-[14px]"
         }
       )
     ] }),
@@ -1935,7 +1949,7 @@ function GuiaContenido({ guia }) {
       conNegritas(guia.quien)
     ] }),
     guia.pasos && guia.pasos.length > 0 && /* @__PURE__ */ jsxRuntime.jsx("ol", { className: "mt-4 space-y-3", children: guia.pasos.map((p, i) => /* @__PURE__ */ jsxRuntime.jsxs("li", { className: "flex gap-3", children: [
-      /* @__PURE__ */ jsxRuntime.jsx("span", { className: "mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-brand text-[11px] font-bold text-white", "aria-hidden": true, children: i + 1 }),
+      /* @__PURE__ */ jsxRuntime.jsx("span", { className: "mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-brand text-[11px] font-bold text-brand-on", "aria-hidden": true, children: i + 1 }),
       /* @__PURE__ */ jsxRuntime.jsx("p", { className: "min-w-0 text-[14px] leading-relaxed text-ink sm:text-[13px]", children: conNegritas(p) })
     ] }, i)) }),
     guia.notas && guia.notas.length > 0 && /* @__PURE__ */ jsxRuntime.jsx("div", { className: "mt-4 space-y-2", children: guia.notas.map((n, i) => /* @__PURE__ */ jsxRuntime.jsx("div", { className: "rounded-md border border-line bg-neutro-50 px-3 py-2 text-[13px] text-ink sm:text-[12px]", children: conNegritas(n) }, i)) })
@@ -2036,7 +2050,7 @@ function GuiaPanel({
               onClick: () => setId(g.id),
               className: cn(
                 "rounded-pill border px-2.5 py-1 text-[12px] transition-colors sm:text-[11px] [@media(pointer:coarse)]:min-h-[40px]",
-                elegida?.id === g.id ? "border-brand bg-brand text-white" : "border-line bg-white text-ink hover:bg-neutro-50"
+                elegida?.id === g.id ? "border-brand bg-brand text-brand-on" : "border-line bg-white text-ink hover:bg-neutro-50"
               ),
               children: g.titulo
             },

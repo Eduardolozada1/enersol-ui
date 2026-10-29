@@ -230,7 +230,7 @@ export function DataTable<T>({
               className={cn(
                 "border-b border-line last:border-0",
                 onRowClick &&
-                  "cursor-pointer hover:bg-neutro-50 focus:outline-none focus-visible:bg-neutro-50 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-rojo-300",
+                  "cursor-pointer hover:bg-neutro-50 focus:outline-none focus-visible:bg-neutro-50 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-ring",
                 rowClassName?.(row),
               )}
             >

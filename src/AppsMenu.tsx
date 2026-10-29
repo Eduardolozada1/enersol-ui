@@ -95,7 +95,7 @@ export function AppsMenu({
                   esActual ? "bg-neutro-100 cursor-default" : "hover:bg-neutro-50",
                 )}
               >
-                <div className={cn("text-caption font-medium", esActual ? "text-brand" : "text-ink")}>
+                <div className={cn("text-caption font-medium", esActual ? "text-brand-text" : "text-ink")}>
                   {m.nombre}
                   {esActual && <span className="ml-2 text-[11px] font-normal text-subtle">estás acá</span>}
                 </div>

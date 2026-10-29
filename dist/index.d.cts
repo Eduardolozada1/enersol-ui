@@ -30,7 +30,7 @@ declare function Spinner({ className }: {
     className?: string;
 }): react.JSX.Element;
 declare function CenteredSpinner(): react.JSX.Element;
-type LogoVariant = "imagotipo-color" | "imagotipo-blanco" | "isotipo-color" | "isotipo-app";
+type LogoVariant = "imagotipo-color" | "imagotipo-blanco" | "isotipo-color" | "isotipo-app" | "bloque-color" | "bloque-negativo";
 /** Marca Enersol. Usar tal cual se entrega, sin alterar proporciones/colores (regla dura
  * del manual). Cada módulo sirve los archivos en `/brand/*.svg|png`; usa el SVG si existe
  * y cae al PNG si no. */
@@ -193,6 +193,11 @@ type AppHeaderLinkProps = {
 /** Desde qué ancho se ve la barra de escritorio; por debajo, el menú ☰. Clases escritas
  *  enteras (no armadas) para que Tailwind las encuentre al escanear el paquete. */
 type AppHeaderBreakpoint = "lg" | "xl" | "2xl";
+/** Cómo se marca la sección actual en la barra de escritorio: «texto» (el ítem en color de
+ *  marca, como siempre) o «subrayado» (texto `brand-text` y una barra `bg-brand` de 3 px pegada al
+ *  borde inferior del encabezado: para una marca cuyo color no sirve como texto sobre blanco,
+ *  como el amarillo de Distribución). */
+type AppHeaderIndicador = "texto" | "subrayado";
 /** ¿La ruta actual es esta sección? Exacta o una subruta («/ventas» y «/ventas/12»), más
  *  lo que diga `match`. «/» solo es actual en «/». */
 declare function isAppHeaderItemActive(item: AppHeaderItem, path: string): boolean;
@@ -202,14 +207,14 @@ declare function groupAppHeaderItems(items: AppHeaderItem[]): {
     groups: Array<[string, AppHeaderItem[]]>;
 };
 /** Encabezado unificado del ecosistema Enersol (blanco, `border-b`, Apps + logo h-7 +
- *  separador + nombre del módulo, navegación en texto con la actual en `text-brand`, sin
- *  pastillas; a la derecha las acciones, el usuario y «Salir»).
+ *  separador + nombre del módulo, navegación en texto con la actual en `text-brand-text` (o
+ *  subrayada, `indicador`), sin pastillas; a la derecha las acciones, el usuario y «Salir»).
  *
  *  Por debajo de `desktopFrom` (por defecto `lg`) la barra se reemplaza por el menú ☰
  *  (MobileMenu) con TODAS las secciones agrupadas, el usuario y «Salir»: en el celular
  *  nunca hay scroll lateral. Las secciones con `group` van en el desplegable «Más» de la
  *  barra de escritorio. Sin dependencias de router: cada módulo pasa `renderLink`. */
-declare function AppHeader({ moduleKey, moduleName, logo, homeHref, items, currentPath, renderLink, notice, persistentActions, actions, user, onLogout, mobileMenuFooter, desktopFrom, moreLabel, hubUrl, className, }: {
+declare function AppHeader({ moduleKey, moduleName, logo, homeHref, items, currentPath, renderLink, notice, persistentActions, actions, user, onLogout, mobileMenuFooter, desktopFrom, moreLabel, hubUrl, indicador, mostrarApps, mostrarNombre, className, }: {
     /** Clave del módulo en el menú Apps (p. ej. "contabilidad"). */
     moduleKey: string;
     moduleName: ReactNode;
@@ -235,6 +240,14 @@ declare function AppHeader({ moduleKey, moduleName, logo, homeHref, items, curre
     desktopFrom?: AppHeaderBreakpoint;
     moreLabel?: ReactNode;
     hubUrl?: string;
+    /** Cómo se marca la sección actual en la barra de escritorio (por defecto, «texto»). */
+    indicador?: AppHeaderIndicador;
+    /** Menú Apps (módulos del ecosistema). En falso para quien no es personal de Enersol (los
+     *  clientes externos de un portal no ven los módulos internos). */
+    mostrarApps?: boolean;
+    /** Nombre del módulo al lado del logo. En falso cuando el logo ya lo dice (el imagotipo de una
+     *  división, «enersol distribución»); el menú ☰ lo sigue usando como título. */
+    mostrarNombre?: boolean;
     className?: string;
 }): react.JSX.Element;
 
@@ -627,4 +640,4 @@ declare function GuiaBoton({ variante, className, ocultarEn, open: openProp, onO
     sinBoton?: boolean;
 }): react.JSX.Element | null;
 
-export { AppHeader, type AppHeaderBreakpoint, type AppHeaderItem, type AppHeaderLinkProps, AppsMenu, Badge, type BadgeTone, Button, type ButtonSize, type ButtonVariant, Card, CardBody, CardHeader, CenteredSpinner, CollapsibleCard, type Column, ConfirmDialog, type ConfirmOptions, type ConfirmReason, type ConfirmResult, type ConfirmTone, DOMINIO_ENERSOL, DataTable, EVENTO_ABRIR_MENSAJES, EmptyState, type ErrorPantalla, type Guia, GuiaBoton, GuiaContenido, GuiaPanel, type GuiaPanelProps, HUB_URL, IconoGuia, Input, Logo, type LogoVariant, MODULOS_ENERSOL, type MensajesApi, type MensajesHilo, type MensajesMensaje, type MensajesPersona, MessagesBell, type MessagesBellProps, MobileMenu, MobileMenuSection, Modal, type ModuloEnersol, PageHeader, Pagination, type PaginationRange, type ReporteErrores, type ReporteErroresOpciones, SUGERENCIA_MAX_BYTES, SUGERENCIA_TIPOS_CAPTURA, Select, type SondeoOpciones, Spinner, SugerenciaBoton, type SugerenciaEnviar, SugerenciaModal, type SugerenciaPayload, type SugerenciaTipo, cn, conNegritas, crearReporteErrores, destinoSeguro, groupAppHeaderItems, guiasPorRuta, iniciarSondeo, instalarReporteErrores, isAppHeaderItemActive, mobileMenuItemClass, normalizarRuta, paginationRange, partirNegritas, rutaEmpieza, rutaInterna, rutasMensajes, safeHref, textoContador, useConfirm, useSondeo, validarSugerencia };
+export { AppHeader, type AppHeaderBreakpoint, type AppHeaderIndicador, type AppHeaderItem, type AppHeaderLinkProps, AppsMenu, Badge, type BadgeTone, Button, type ButtonSize, type ButtonVariant, Card, CardBody, CardHeader, CenteredSpinner, CollapsibleCard, type Column, ConfirmDialog, type ConfirmOptions, type ConfirmReason, type ConfirmResult, type ConfirmTone, DOMINIO_ENERSOL, DataTable, EVENTO_ABRIR_MENSAJES, EmptyState, type ErrorPantalla, type Guia, GuiaBoton, GuiaContenido, GuiaPanel, type GuiaPanelProps, HUB_URL, IconoGuia, Input, Logo, type LogoVariant, MODULOS_ENERSOL, type MensajesApi, type MensajesHilo, type MensajesMensaje, type MensajesPersona, MessagesBell, type MessagesBellProps, MobileMenu, MobileMenuSection, Modal, type ModuloEnersol, PageHeader, Pagination, type PaginationRange, type ReporteErrores, type ReporteErroresOpciones, SUGERENCIA_MAX_BYTES, SUGERENCIA_TIPOS_CAPTURA, Select, type SondeoOpciones, Spinner, SugerenciaBoton, type SugerenciaEnviar, SugerenciaModal, type SugerenciaPayload, type SugerenciaTipo, cn, conNegritas, crearReporteErrores, destinoSeguro, groupAppHeaderItems, guiasPorRuta, iniciarSondeo, instalarReporteErrores, isAppHeaderItemActive, mobileMenuItemClass, normalizarRuta, paginationRange, partirNegritas, rutaEmpieza, rutaInterna, rutasMensajes, safeHref, textoContador, useConfirm, useSondeo, validarSugerencia };

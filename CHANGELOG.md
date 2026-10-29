@@ -3,6 +3,21 @@
 Cada versión se publica con su etiqueta (`vX.Y.Z`); los módulos la adoptan subiendo la
 etiqueta en su `package.json`. Detalle y ejemplos de uso en el README.
 
+## 0.5.0 — 29/10/2026
+
+Sin cambios visibles en los módulos (la galería da las mismas 46 capturas que la 0.4.0, en
+Tailwind v3 y v4, escritorio y celular). Para la submarca de Enersol Distribución:
+
+- Alias de marca `brand-on`, `brand-hover`, `brand-text`, `brand-ring`, `brand-soft` y
+  `brand-badge` en el preset y en `theme.css`, con los valores de siempre; los componentes los usan
+  (Button, Input, Select, Badge «marca», AppHeader, MobileMenu, AppsMenu, Pagination, DataTable,
+  ConfirmDialog, Guia, MessagesBell, Sugerencia).
+- `AppHeader`: `indicador` («texto» | «subrayado»), `mostrarApps` y `mostrarNombre`.
+- `Logo`: variantes `bloque-color` y `bloque-negativo`.
+- `tailwind-preset-distribucion.cjs` y `theme-distribucion.css` (amarillo solar + grafito).
+- `galeria/`: comparación píxel a píxel entre la última etiqueta y el árbol de trabajo.
+- `npm test`: 12 pruebas nuevas (50 en total).
+
 ## 0.4.0 — 29/10/2026
 
 Aditivo (nada de lo anterior cambia). Piezas que cada módulo tenía copiadas y divergentes:

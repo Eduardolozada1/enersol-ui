@@ -119,7 +119,7 @@ export function Pagination({
                     "tnum h-8 min-w-[2rem] rounded-md px-2 text-caption font-medium transition-colors",
                     "[@media(pointer:coarse)]:min-h-[44px] [@media(pointer:coarse)]:min-w-[44px]",
                     "disabled:pointer-events-none disabled:opacity-50",
-                    p === r.page ? "bg-neutro-100 text-brand" : "text-ink hover:bg-neutro-50",
+                    p === r.page ? "bg-neutro-100 text-brand-text" : "text-ink hover:bg-neutro-50",
                   )}
                 >
                   {miles(p)}

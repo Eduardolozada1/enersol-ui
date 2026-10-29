@@ -97,7 +97,7 @@ export function MobileMenu({
 export function mobileMenuItemClass(activo = false): string {
   return cn(
     "flex min-h-[48px] w-full items-center gap-3 rounded-md px-3 text-left text-[16px] font-medium transition-colors",
-    activo ? "bg-neutro-100 text-brand" : "text-ink hover:bg-neutro-50",
+    activo ? "bg-neutro-100 text-brand-text" : "text-ink hover:bg-neutro-50",
   );
 }
 
