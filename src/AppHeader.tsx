@@ -244,7 +244,9 @@ export function AppHeader({
         </div>
       )}
       <div className={cn("flex h-16 items-center justify-between gap-2 px-3", bp.gap, bp.px)}>
-        <div className={cn("flex min-w-0 items-center gap-2", bp.gap)}>
+        {/* con «subrayado» la fila del logo y la barra ocupa todo el alto (h-16): así la barra de la
+            sección actual queda pegada al borde inferior del encabezado y no debajo del texto */}
+        <div className={cn("flex min-w-0 items-center gap-2", bp.gap, indicador === "subrayado" && "self-stretch")}>
           {mostrarApps && <AppsMenu actual={moduleKey} hubUrl={hubUrl} className="-ml-1.5 shrink-0" />}
           {renderLink({ href: homeHref, className: "shrink-0", children: logo })}
           {mostrarNombre && (
