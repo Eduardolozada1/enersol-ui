@@ -154,11 +154,27 @@ declare function AppsMenu({ actual, hubUrl, modulos, accesos, className, }: {
     actual: string;
     hubUrl?: string;
     modulos?: ModuloEnersol[];
-    /** Claves de los módulos que la persona tiene habilitados en el Hub (las del lanzador). Hace
-     *  falta para listar los `soloConAcceso`; sin ella, esos no se muestran. */
+    /** Claves de los módulos que la persona tiene habilitados en el Hub (las del lanzador), para
+     *  listar los `soloConAcceso`. Sin la prop (undefined), las que el módulo guardó al recibir el
+     *  ticket de SSO (`guardarAccesosDelTicket`, 0.7.0); null = ninguna. */
     accesos?: readonly string[] | null;
     className?: string;
 }): react.JSX.Element;
+
+/** Las claves de los módulos que trae el ticket de SSO del Hub (`modulos`), o null si el ticket
+ *  no las trae (un Hub de antes) o no se puede leer. */
+declare function accesosDelTicket(ticket: string | null | undefined): string[] | null;
+/** Al recibir el ticket de SSO: guarda los módulos de la persona para el menú Apps. Si el ticket
+ *  no los trae, borra lo guardado (nunca queda la lista de otra persona). */
+declare function guardarAccesosDelTicket(ticket: string | null | undefined): void;
+/** Los módulos guardados en este navegador, o null si no hay. */
+declare function accesosGuardados(): string[] | null;
+/** Al cerrar la sesión: olvida los módulos guardados (la próxima persona en ese navegador no ve
+ *  los de la anterior). */
+declare function olvidarAccesos(): void;
+/** Lo que usa el menú Apps: la prop `accesos` si el módulo la pasa (también null = ninguno) y, si
+ *  no la pasa (undefined), los guardados al entrar por SSO. */
+declare function accesosDelMenu(accesos: readonly string[] | null | undefined): readonly string[] | null;
 
 /** Menú del encabezado para celular y tablet (se usa con `lg:hidden`; en escritorio cada
  *  módulo sigue mostrando su barra de navegación de siempre). Un botón ☰ abre una hoja a la
@@ -251,7 +267,8 @@ declare function AppHeader({ moduleKey, moduleName, logo, homeHref, items, curre
     moreLabel?: ReactNode;
     hubUrl?: string;
     /** Módulos que la persona tiene habilitados en el Hub (para los del menú Apps que solo ve quien
-     *  tiene acceso, como Distribución). Ver `AppsMenu`. */
+     *  tiene acceso, como Distribución). Sin la prop, los que se guardaron al entrar por SSO. Ver
+     *  `AppsMenu`. */
     accesos?: readonly string[] | null;
     /** Cómo se marca la sección actual en la barra de escritorio (por defecto, «texto»). */
     indicador?: AppHeaderIndicador;
@@ -653,4 +670,4 @@ declare function GuiaBoton({ variante, className, ocultarEn, open: openProp, onO
     sinBoton?: boolean;
 }): react.JSX.Element | null;
 
-export { AppHeader, type AppHeaderBreakpoint, type AppHeaderIndicador, type AppHeaderItem, type AppHeaderLinkProps, AppsMenu, Badge, type BadgeTone, Button, type ButtonSize, type ButtonVariant, Card, CardBody, CardHeader, CenteredSpinner, CollapsibleCard, type Column, ConfirmDialog, type ConfirmOptions, type ConfirmReason, type ConfirmResult, type ConfirmTone, DOMINIO_ENERSOL, DataTable, EVENTO_ABRIR_MENSAJES, EmptyState, type ErrorPantalla, type Guia, GuiaBoton, GuiaContenido, GuiaPanel, type GuiaPanelProps, HUB_URL, IconoGuia, Input, Logo, type LogoVariant, MODULOS_ENERSOL, type MensajesApi, type MensajesHilo, type MensajesMensaje, type MensajesPersona, MessagesBell, type MessagesBellProps, MobileMenu, MobileMenuSection, Modal, type ModuloEnersol, PageHeader, Pagination, type PaginationRange, type ReporteErrores, type ReporteErroresOpciones, SUGERENCIA_MAX_BYTES, SUGERENCIA_TIPOS_CAPTURA, Select, type SondeoOpciones, Spinner, SugerenciaBoton, type SugerenciaEnviar, SugerenciaModal, type SugerenciaPayload, type SugerenciaTipo, cn, conNegritas, crearReporteErrores, destinoSeguro, groupAppHeaderItems, guiasPorRuta, iniciarSondeo, instalarReporteErrores, isAppHeaderItemActive, mobileMenuItemClass, modulosVisibles, normalizarRuta, paginationRange, partirNegritas, rutaEmpieza, rutaInterna, rutasMensajes, safeHref, textoContador, useConfirm, useSondeo, validarSugerencia };
+export { AppHeader, type AppHeaderBreakpoint, type AppHeaderIndicador, type AppHeaderItem, type AppHeaderLinkProps, AppsMenu, Badge, type BadgeTone, Button, type ButtonSize, type ButtonVariant, Card, CardBody, CardHeader, CenteredSpinner, CollapsibleCard, type Column, ConfirmDialog, type ConfirmOptions, type ConfirmReason, type ConfirmResult, type ConfirmTone, DOMINIO_ENERSOL, DataTable, EVENTO_ABRIR_MENSAJES, EmptyState, type ErrorPantalla, type Guia, GuiaBoton, GuiaContenido, GuiaPanel, type GuiaPanelProps, HUB_URL, IconoGuia, Input, Logo, type LogoVariant, MODULOS_ENERSOL, type MensajesApi, type MensajesHilo, type MensajesMensaje, type MensajesPersona, MessagesBell, type MessagesBellProps, MobileMenu, MobileMenuSection, Modal, type ModuloEnersol, PageHeader, Pagination, type PaginationRange, type ReporteErrores, type ReporteErroresOpciones, SUGERENCIA_MAX_BYTES, SUGERENCIA_TIPOS_CAPTURA, Select, type SondeoOpciones, Spinner, SugerenciaBoton, type SugerenciaEnviar, SugerenciaModal, type SugerenciaPayload, type SugerenciaTipo, accesosDelMenu, accesosDelTicket, accesosGuardados, cn, conNegritas, crearReporteErrores, destinoSeguro, groupAppHeaderItems, guardarAccesosDelTicket, guiasPorRuta, iniciarSondeo, instalarReporteErrores, isAppHeaderItemActive, mobileMenuItemClass, modulosVisibles, normalizarRuta, olvidarAccesos, paginationRange, partirNegritas, rutaEmpieza, rutaInterna, rutasMensajes, safeHref, textoContador, useConfirm, useSondeo, validarSugerencia };

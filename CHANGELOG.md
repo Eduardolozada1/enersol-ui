@@ -3,6 +3,20 @@
 Cada versión se publica con su etiqueta (`vX.Y.Z`); los módulos la adoptan subiendo la
 etiqueta en su `package.json`. Detalle y ejemplos de uso en el README.
 
+## 0.7.0 — 03/11/2026
+
+Aditivo: nada cambia en un módulo hasta que guarde los accesos al entrar por SSO.
+
+- **El menú Apps sabe solo qué módulos tiene la persona.** El Hub manda las claves en el ticket de
+  SSO (`modulos`); `guardarAccesosDelTicket(ticket)` las guarda en el navegador al recibirlo y
+  `olvidarAccesos()` las borra al salir. `AppsMenu` y `AppHeader` sin `accesos` usan lo guardado
+  (`accesosDelMenu`); con `accesos` (también `null`) manda la prop, como antes. Así Distribución
+  aparece en el menú de cada módulo para quien la tiene habilitada.
+- Solo para listar: el ticket se lee sin verificar la firma (el acceso lo sigue decidiendo el Hub
+  en `/ir/`). Claves validadas (`[a-z0-9_-]`, hasta 50); un ticket sin `modulos` borra lo guardado
+  y sin almacenamiento (bloqueado, en el servidor) nada falla.
+- `npm test`: 7 pruebas nuevas (61 en total).
+
 ## 0.6.0 — 29/10/2026
 
 Ajustes de contraste aprobados por Eduardo (29/10/2026). **Cambian a propósito cómo se ven

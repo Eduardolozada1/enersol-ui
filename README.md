@@ -263,6 +263,28 @@ Rechaza `//x`, `/\x`, tabs y saltos de línea, `javascript:`, otros dominios y U
 usuario/clave; ante la duda, `"/"` (o `porDefecto`). También `rutaInterna(raw)` y
 `safeHref(raw)` (los del Hub).
 
+## 0.7.0 — El menú Apps sabe solo qué módulos tiene la persona (03/11/2026)
+
+El Hub manda en el ticket de SSO las claves de los módulos que la persona tiene habilitados
+(`modulos`). El módulo las guarda al recibir el ticket y el menú Apps las usa sin que el módulo
+pase `accesos`:
+
+```ts
+import { guardarAccesosDelTicket, olvidarAccesos } from "@enersol/ui";
+
+// en la página del SSO, apenas llega el ticket (antes de canjearlo):
+guardarAccesosDelTicket(ticket);
+// al cerrar la sesión:
+olvidarAccesos();
+```
+
+- Solo deciden qué se lista en el menú: quién entra a cada módulo lo sigue decidiendo el Hub en
+  `/ir/`. Por eso el ticket se lee sin verificar la firma (eso lo hace el backend del módulo).
+- Un ticket sin `modulos` (un Hub de antes) borra lo guardado. Lo guardado con otra forma, o un
+  navegador con el almacenamiento bloqueado, deja el menú como en la 0.6.0.
+- `accesos` sigue mandando cuando se pasa (también `null` = ninguno), como en el Hub.
+- `accesosDelTicket`, `accesosGuardados` y `accesosDelMenu` para quien los necesite aparte.
+
 ## 0.6.0 — Contraste de campos, foco y pastilla verde (29/10/2026)
 
 Aprobado por Eduardo (29/10/2026); cambia a propósito cómo se ven los módulos que suben de

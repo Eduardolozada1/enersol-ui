@@ -211,7 +211,8 @@ export function AppHeader({
   moreLabel?: ReactNode;
   hubUrl?: string;
   /** Módulos que la persona tiene habilitados en el Hub (para los del menú Apps que solo ve quien
-   *  tiene acceso, como Distribución). Ver `AppsMenu`. */
+   *  tiene acceso, como Distribución). Sin la prop, los que se guardaron al entrar por SSO. Ver
+   *  `AppsMenu`. */
   accesos?: readonly string[] | null;
   /** Cómo se marca la sección actual en la barra de escritorio (por defecto, «texto»). */
   indicador?: AppHeaderIndicador;
