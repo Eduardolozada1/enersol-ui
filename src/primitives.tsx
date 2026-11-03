@@ -10,7 +10,7 @@ const BUTTON_VARIANTS: Record<ButtonVariant, string> = {
   primary: "bg-brand text-brand-on hover:bg-brand-hover focus-visible:ring-brand-ring",
   secondary: "bg-white text-ink border border-line hover:bg-neutro-50 focus-visible:ring-neutro-200",
   ghost: "bg-transparent text-ink hover:bg-neutro-100 focus-visible:ring-neutro-200",
-  danger: "bg-rojo-600 text-white hover:bg-rojo-700 focus-visible:ring-rojo-300",
+  danger: "bg-rojo-600 text-white hover:bg-rojo-700 focus-visible:ring-rojo-400",
 };
 const BUTTON_SIZES: Record<ButtonSize, string> = {
   sm: "h-8 px-3 text-caption",
@@ -67,9 +67,9 @@ export type BadgeTone = "neutro" | "rojo" | "verde" | "atencion" | "marca";
 const BADGE_TONES: Record<BadgeTone, string> = {
   neutro: "bg-neutro-100 text-neutro-900 border border-neutro-200",
   rojo: "bg-rojo-600 text-white",
-  verde: "bg-verde-100 text-verde-600 border border-verde-300",
+  verde: "bg-verde-100 text-verde-700 border border-verde-300",
   atencion: "bg-ambar-100 text-ambar-700 border border-ambar-300",
-  marca: "bg-white text-brand-badge border border-brand-ring",
+  marca: "bg-white text-brand-badge border border-brand-line",
 };
 
 export function Badge({
@@ -94,9 +94,9 @@ export function Input({ className, ...props }: InputHTMLAttributes<HTMLInputElem
   return (
     <input
       className={cn(
-        "h-10 w-full rounded-md border border-line bg-white px-3 text-body text-ink",
+        "h-10 w-full rounded-md border border-neutro-500 bg-white px-3 text-body text-ink",
         TACTIL,
-        "placeholder:text-neutro-300",
+        "placeholder:text-neutro-700",
         "focus:outline-none focus:ring-2 focus:ring-brand-ring focus:border-brand-ring",
         className,
       )}
@@ -109,7 +109,7 @@ export function Select({ className, ...props }: SelectHTMLAttributes<HTMLSelectE
   return (
     <select
       className={cn(
-        "h-9 rounded-md border border-line bg-white px-3 text-base sm:text-caption text-ink",
+        "h-9 rounded-md border border-neutro-500 bg-white px-3 text-base sm:text-caption text-ink",
         TACTIL,
         "focus:outline-none focus:ring-2 focus:ring-brand-ring",
         className,

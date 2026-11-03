@@ -38,6 +38,7 @@
   --color-verde-300: #A9BE67;
   --color-verde-500: #709302;
   --color-verde-600: #5A7602;
+  --color-verde-700: #4D6502;
 
   --color-amarillo: #FFC02E;
 
@@ -46,7 +47,8 @@
   --color-brand-hover: #AB2020;
   --color-brand-fg: #AB2020;
   --color-brand-text: #D62828;
-  --color-brand-ring: #E67E7E;
+  --color-brand-ring: #DE5353;
+  --color-brand-line: #E67E7E;
   --color-brand-soft: #FBEAEA;
   --color-brand-badge: #801818;
   --color-brand-strong: #801818;

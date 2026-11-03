@@ -41,7 +41,8 @@ module.exports = {
           hover: "#E99A06",
           fg: "#865904",
           text: "#373A3C", // el acento del ítem activo es el subrayado amarillo (AppHeader indicador="subrayado")
-          ring: "#FBCA6F",
+          ring: "#B37605", // foco (= amarillo-700; 3,8:1 sobre blanco)
+          line: "#FBCA6F", // contorno del Badge «marca» (= amarillo-300)
           soft: "#FEF7E9",
           badge: "#865904",
           strong: "#593B02",
