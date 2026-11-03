@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { accesosDelMenu } from "./accesosHub";
 import { cn } from "./cn";
 
 /** Los módulos del ecosistema Enersol. El orden es el del lanzador del Hub. Los links pasan
@@ -56,8 +57,9 @@ export function AppsMenu({
   actual: string;
   hubUrl?: string;
   modulos?: ModuloEnersol[];
-  /** Claves de los módulos que la persona tiene habilitados en el Hub (las del lanzador). Hace
-   *  falta para listar los `soloConAcceso`; sin ella, esos no se muestran. */
+  /** Claves de los módulos que la persona tiene habilitados en el Hub (las del lanzador), para
+   *  listar los `soloConAcceso`. Sin la prop (undefined), las que el módulo guardó al recibir el
+   *  ticket de SSO (`guardarAccesosDelTicket`, 0.7.0); null = ninguna. */
   accesos?: readonly string[] | null;
   className?: string;
 }) {
@@ -105,7 +107,7 @@ export function AppsMenu({
           className="absolute left-0 top-full z-30 mt-2 w-72 max-w-[calc(100vw-1.5rem)] rounded-card border border-line bg-surface p-1.5 shadow-card"
         >
           <div className="px-2.5 pb-1.5 pt-1 text-[11px] font-semibold uppercase tracking-wide text-subtle">Módulos</div>
-          {modulosVisibles(modulos, actual, accesos).map((m) => {
+          {modulosVisibles(modulos, actual, accesosDelMenu(accesos)).map((m) => {
             const esActual = m.clave === actual;
             const href = m.clave === "plataforma" ? hubUrl : `${hubUrl}/ir/${m.clave}`;
             return (

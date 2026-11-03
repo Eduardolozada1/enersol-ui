@@ -19,6 +19,7 @@ export type { BadgeTone, ButtonSize, ButtonVariant, LogoVariant } from "./primit
 export { DataTable } from "./DataTable";
 export type { Column } from "./DataTable";
 export { AppsMenu, HUB_URL, MODULOS_ENERSOL, modulosVisibles } from "./AppsMenu";
+export { accesosDelMenu, accesosDelTicket, accesosGuardados, guardarAccesosDelTicket, olvidarAccesos } from "./accesosHub";
 export { MobileMenu, MobileMenuSection, mobileMenuItemClass } from "./MobileMenu";
 export type { ModuloEnersol } from "./AppsMenu";
 export { AppHeader, groupAppHeaderItems, isAppHeaderItemActive } from "./AppHeader";

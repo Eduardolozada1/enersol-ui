@@ -434,6 +434,67 @@ function DataTable({
     }
   );
 }
+
+// src/accesosHub.ts
+var CLAVE = "enersol-accesos-hub";
+function base64UrlATexto(parte) {
+  const base64 = parte.replace(/-/g, "+").replace(/_/g, "/");
+  const relleno = base64 + "=".repeat((4 - base64.length % 4) % 4);
+  return atob(relleno);
+}
+function esListaDeClaves(valor) {
+  return Array.isArray(valor) && valor.length <= 50 && valor.every((v) => typeof v === "string" && /^[a-z0-9_-]{1,40}$/.test(v));
+}
+function accesosDelTicket(ticket) {
+  if (!ticket) return null;
+  try {
+    const parte = ticket.split(".")[1];
+    if (!parte) return null;
+    const datos = JSON.parse(base64UrlATexto(parte));
+    return esListaDeClaves(datos.modulos) ? datos.modulos : null;
+  } catch {
+    return null;
+  }
+}
+function almacen() {
+  try {
+    return typeof localStorage === "undefined" ? null : localStorage;
+  } catch {
+    return null;
+  }
+}
+function guardarAccesosDelTicket(ticket) {
+  const modulos = accesosDelTicket(ticket);
+  const a = almacen();
+  if (!a) return;
+  try {
+    if (modulos) a.setItem(CLAVE, JSON.stringify(modulos));
+    else a.removeItem(CLAVE);
+  } catch {
+  }
+}
+function accesosGuardados() {
+  const a = almacen();
+  if (!a) return null;
+  try {
+    const valor = a.getItem(CLAVE);
+    if (!valor) return null;
+    const lista = JSON.parse(valor);
+    return esListaDeClaves(lista) ? lista : null;
+  } catch {
+    return null;
+  }
+}
+function olvidarAccesos() {
+  const a = almacen();
+  try {
+    a?.removeItem(CLAVE);
+  } catch {
+  }
+}
+function accesosDelMenu(accesos) {
+  return accesos === void 0 ? accesosGuardados() : accesos;
+}
 var HUB_URL = "https://app.enersol-sa.com";
 var MODULOS_ENERSOL = [
   { clave: "plataforma", nombre: "App Enersol", url: HUB_URL, descripcion: "Inicio, accesos, mensajes y correos" },
@@ -510,7 +571,7 @@ function AppsMenu({
         className: "absolute left-0 top-full z-30 mt-2 w-72 max-w-[calc(100vw-1.5rem)] rounded-card border border-line bg-surface p-1.5 shadow-card",
         children: [
           /* @__PURE__ */ jsx("div", { className: "px-2.5 pb-1.5 pt-1 text-[11px] font-semibold uppercase tracking-wide text-subtle", children: "M\xF3dulos" }),
-          modulosVisibles(modulos, actual, accesos).map((m) => {
+          modulosVisibles(modulos, actual, accesosDelMenu(accesos)).map((m) => {
             const esActual = m.clave === actual;
             const href = m.clave === "plataforma" ? hubUrl : `${hubUrl}/ir/${m.clave}`;
             return /* @__PURE__ */ jsxs(
@@ -2113,4 +2174,4 @@ function GuiaBoton({
   ] });
 }
 
-export { AppHeader, AppsMenu, Badge, Button, Card, CardBody, CardHeader, CenteredSpinner, CollapsibleCard, ConfirmDialog, DOMINIO_ENERSOL, DataTable, EVENTO_ABRIR_MENSAJES, EmptyState, GuiaBoton, GuiaContenido, GuiaPanel, HUB_URL, IconoGuia, Input, Logo, MODULOS_ENERSOL, MessagesBell, MobileMenu, MobileMenuSection, Modal, PageHeader, Pagination, SUGERENCIA_MAX_BYTES, SUGERENCIA_TIPOS_CAPTURA, Select, Spinner, SugerenciaBoton, SugerenciaModal, cn, conNegritas, crearReporteErrores, destinoSeguro, groupAppHeaderItems, guiasPorRuta, iniciarSondeo, instalarReporteErrores, isAppHeaderItemActive, mobileMenuItemClass, modulosVisibles, normalizarRuta, paginationRange, partirNegritas, rutaEmpieza, rutaInterna, rutasMensajes, safeHref, textoContador, useConfirm, useSondeo, validarSugerencia };
+export { AppHeader, AppsMenu, Badge, Button, Card, CardBody, CardHeader, CenteredSpinner, CollapsibleCard, ConfirmDialog, DOMINIO_ENERSOL, DataTable, EVENTO_ABRIR_MENSAJES, EmptyState, GuiaBoton, GuiaContenido, GuiaPanel, HUB_URL, IconoGuia, Input, Logo, MODULOS_ENERSOL, MessagesBell, MobileMenu, MobileMenuSection, Modal, PageHeader, Pagination, SUGERENCIA_MAX_BYTES, SUGERENCIA_TIPOS_CAPTURA, Select, Spinner, SugerenciaBoton, SugerenciaModal, accesosDelMenu, accesosDelTicket, accesosGuardados, cn, conNegritas, crearReporteErrores, destinoSeguro, groupAppHeaderItems, guardarAccesosDelTicket, guiasPorRuta, iniciarSondeo, instalarReporteErrores, isAppHeaderItemActive, mobileMenuItemClass, modulosVisibles, normalizarRuta, olvidarAccesos, paginationRange, partirNegritas, rutaEmpieza, rutaInterna, rutasMensajes, safeHref, textoContador, useConfirm, useSondeo, validarSugerencia };
